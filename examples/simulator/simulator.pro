@@ -56,9 +56,9 @@ QMAKE_CXXFLAGS += -D GRIF_CODE_GENERATION=1 -O3
 ## 
 # Please fill in GRIFDIR and ROOTDIR with the appropriate paths
 # Top directory of GRIF on your machine:
-GRIFDIR =
+GRIFDIR = C:/grif
 # Directory of ROOT on your machine:
-ROOTDIR =
+ROOTDIR = C:/root
 
 # run code generation
 GRIFPROJECTDIR = $$GRIFDIR/examples/simulator
@@ -87,10 +87,10 @@ INCLUDEPATH += $$ROOTDIR/include
 # ROOT libraries
 ROOTSYSLIB += $$ROOTDIR/lib
 INCLUDEPATH += $$ROOTSYSLIB
-LIBS += $$ROOTSYSLIB/libCint.so
-LIBS += $$ROOTSYSLIB/libCore.so
-LIBS += $$ROOTSYSLIB/libHist.so
-LIBS += $$ROOTSYSLIB/libMatrix.so
-LIBS += $$ROOTSYSLIB/libMathCore.so
+LIBS += $$ROOTSYSLIB/libCint.lib
+LIBS += $$ROOTSYSLIB/libCore.lib
+LIBS += $$ROOTSYSLIB/libHist.lib
+LIBS += $$ROOTSYSLIB/libMatrix.lib
+LIBS += $$ROOTSYSLIB/libMathCore.lib
 LIBS += -L$$ROOTSYSLIB
 

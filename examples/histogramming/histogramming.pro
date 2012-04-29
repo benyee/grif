@@ -61,9 +61,9 @@ HEADERS += \
 ## 
 # Please fill in GRIFDIR and ROOTDIR with the appropriate paths
 # Top directory of GRIF on your machine:
-GRIFDIR =
+GRIFDIR =C:/grif
 # Directory of ROOT on your machine:
-ROOTDIR =
+ROOTDIR =C:/root
 
 
 
@@ -92,8 +92,8 @@ INCLUDEPATH += $$ROOTDIR/include
 # ROOT libraries
 ROOTSYSLIB += $$ROOTDIR/lib
 INCLUDEPATH += $$ROOTSYSLIB
-LIBS += $$ROOTSYSLIB/libCint.so
-LIBS += $$ROOTSYSLIB/libMatrix.so
-LIBS += $$ROOTSYSLIB/libMathCore.so
+LIBS += $$ROOTSYSLIB/libCint.lib
+LIBS += $$ROOTSYSLIB/libMatrix.lib
+LIBS += $$ROOTSYSLIB/libMathCore.lib
 LIBS += -L$$ROOTSYSLIB
-LIBS += -L$$ROOTSYS/lib -lCore -lHist
+LIBS += -L$$ROOTSYS/lib -llibCore -llibHist
