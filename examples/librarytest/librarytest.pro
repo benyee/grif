@@ -42,7 +42,7 @@ LIBS += -L$$ROOTSYSLIB
 LIBS += -L$$ROOTSYS/lib -llibCore -llibHist
 
 INCLUDEPATH+= $$LYNXDIR
-#LIBS += $$LYNXDIR/1033.dll
+LIBS += $$LYNXDIR/1033.lib
 LIBS += $$LYNXDIR/Communications.lib
 LIBS += $$LYNXDIR/DataTypes.lib
 LIBS += $$LYNXDIR/DevCntl.lib
@@ -52,3 +52,8 @@ LIBS += $$LYNXDIR/Serialization.lib
 LIBS += $$LYNXDIR/Utility.lib
 
 INCLUDEPATH+="C:/Canberra/SDK/CPPExamples/Examples/Include"
+INCLUDEPATH+="C:\Canberra\SDK\CPPExamples\Examples\ExampleList"
+
+#Need the following for some of the functions used in Utilities.h:
+LIBS+="C:\Program Files\Microsoft SDKs\Windows\v7.0A\Lib\WS2_32.lib"
+LIBS+="C:\Program Files\Microsoft SDKs\Windows\v7.0A\Lib\IPHlpApi.lib"
