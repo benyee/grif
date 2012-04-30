@@ -1,1 +1,1 @@
-app_file = "C:/grif/examples/simulator/XML/app/APP.XML";
+app_file = "C:/grif/examples/LynxDAQ/XML/app/APP.XML";

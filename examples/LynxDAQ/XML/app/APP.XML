@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<app>
+  <Objects>
+    <object name= "LynxDAQ" class = "LynxDAQ"></object>
+    <object name= "A1" class = "SIMAnalysis"></object>
+  </Objects>
+
+  <Links>
+    <link writer = "LynxDAQ" reader = "A1" data = "ADCOutput"></link>
+    <link writer = "LynxDAQ" reader = "A1" data = "TS"></link>
+  </Links>
+</app>

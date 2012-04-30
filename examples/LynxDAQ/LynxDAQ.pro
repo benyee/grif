@@ -9,14 +9,15 @@ TARGET = LynxDAQ
 
 SOURCES += \
     src/main.cpp \
-    src/LynxDAQ.cpp
+    src/LynxDAQ.cpp \
+    src/SIMAnalysisThread.cpp
 
 HEADERS += \
-    include/LynxDAQ.h
+    include/LynxDAQ.h \
+    include/SIMAnalysisThread.h
 
 
 QMAKE_CXXFLAGS += -D GRIF_CODE_GENERATION=1 -O3
-
 
 ##
 # Please fill in GRIFDIR and ROOTDIR with the appropriate paths
@@ -25,6 +26,12 @@ GRIFDIR =C:/grif
 # Directory of ROOT on your machine:
 ROOTDIR =C:/root
 LYNXDIR = "C:\Canberra\LynxCOM_SDKInstaller"
+
+# run code generation
+GRIFPROJECTDIR = $$GRIFDIR/examples/LynxDAQ
+system(cd $$GRIFPROJECTDIR)
+system(python setup.py)
+
 
 GRIF_LOG_DIR = $$GRIFDIR/log/
 win32 {

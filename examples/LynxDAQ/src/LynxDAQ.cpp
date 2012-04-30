@@ -18,6 +18,11 @@ GRIDAQBaseAccumNode* LynxDAQ::RegisterDataOutput(QString outName) {
 }
 
 int LynxDAQ::AcquireData(int n) {
+    //Dummy data:
+    double* dummyADC = new double[5];
+    qint64* dummy_ts = new qint64[5];
+    PostData<double>(5, "ADCOutput",dummyADC,dummy_ts);
+    PostData<qint64>(5, "TS",dummy_ts,dummy_ts);
   return 0;
 }
 

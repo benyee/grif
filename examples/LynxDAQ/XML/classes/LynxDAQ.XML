@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<class>
+  <Name name = "LynxDAQ" />
+  <Header hname = "LynxDAQ.h" />
+  <Info cname = "LynxDAQ" isdaq = "true" />
+  <RunTimeParams>
+  </RunTimeParams>
+  <DataBlocks> 
+    <Data block = "ADCOutput" /> 
+    <Data block = "CHAN" /> 
+    <Data block = "TS" />
+  </DataBlocks> 
+</class>
