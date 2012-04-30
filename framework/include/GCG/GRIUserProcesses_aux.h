@@ -9,8 +9,6 @@ which can be found in grif/framework/util
 
 
 //Code-generated includes (harvested from XML files => Header tag)
-#include "SIMAnalysisThread.h"
-#include "SIMDAQThread.h"
 
 
 #endif // GRIUSERPROCESSES_AUX_H
