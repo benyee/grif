@@ -21,10 +21,10 @@ GRIDAQBaseAccumNode* LynxDAQ::RegisterDataOutput(QString outName) {
 
 int LynxDAQ::ConnectToDAQ(){
     //Open a connection to the device
-    lynx->Open ('10.0.0.7', '10.0.0.3');
+    //lynx->Open ('10.0.0.7', '10.0.0.3');
 
     //Display the name of the lynx
-    cout << "You are connected to: " << (lynx->GetParameter (DevCntl::Network_MachineName, (short) 0)) << "\n";
+    //cout << "You are connected to: " << (lynx->GetParameter (DevCntl::Network_MachineName, (short) 0)) << "\n";
 
     return 0;
 }

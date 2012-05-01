@@ -45,8 +45,6 @@ INCLUDEPATH += ../../ . \
 
 include(../../framework/source/fsource.pri)
 include(../../framework/include/finclude.pri)
-include(../../framework/source/hist/histsource.pri)
-include(../../framework/include/hist/histinclude.pri)
 
 # Source file and headers
 SOURCES += \
@@ -65,12 +63,12 @@ GRIFDIR =C:/grif
 # Directory of ROOT on your machine:
 ROOTDIR =C:/root
 
-
-
 # run code generation
 GRIFPROJECTDIR = $$GRIFDIR/examples/histogramming
+UTILDIR = $$GRIFDIR/util
+system(cd $$UTILDIR)
+system(python setup.py $$GRIFPROJECTDIR)
 system(cd $$GRIFPROJECTDIR)
-system(python setup.py)
 
 QMAKE_CXXFLAGS += -D GRIF_CODE_GENERATION=1 -O3
 
@@ -81,20 +79,28 @@ win32 {
     GRIF_LOG_DIR = $$GRIFPROJECTDIR\\log
 }
 
-
 DEFINES += GRIF_LOG_DIR=\\\"$${GRIF_LOG_DIR}\\\"
 # External libraries
 INCLUDEPATH += $$GRIFDIR/external
-
 
 # ROOT headers
 INCLUDEPATH += $$ROOTDIR/include
 # ROOT libraries
 ROOTSYSLIB += $$ROOTDIR/lib
 INCLUDEPATH += $$ROOTSYSLIB
-<<<<<<< HEAD
-LIBS += $$ROOTSYSLIB/libCint.lib
-LIBS += $$ROOTSYSLIB/libMatrix.lib
-LIBS += $$ROOTSYSLIB/libMathCore.lib
-LIBS += -L$$ROOTSYSLIB
-LIBS += -L$$ROOTSYS/lib -llibCore -llibHist
+
+# All *nix systems
+unix|macx {
+    LIBS += -L$$ROOTSYSLIB
+    LIBS += -L$$ROOTSYS/lib -lCore -lHist -lMatrix -lMathCore
+    LIBS += $$ROOTSYSLIB/libCint.so
+    LIBS += $$ROOTSYSLIB/libCore.so
+    LIBS += $$ROOTSYSLIB/libHist.so
+    LIBS += $$ROOTSYSLIB/libMatrix.so
+    LIBS += $$ROOTSYSLIB/libMathCore.so
+}
+# All windows platforms
+win32 {
+    LIBS += -L$$ROOTSYSLIB
+    LIBS += -L$$ROOTSYS/lib -llibCore -llibHist -llibMatrix -llibMathCore -llibCint
+}
