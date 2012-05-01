@@ -51,8 +51,6 @@ GRIHist1DGridScrollWidget::GRIHist1DGridScrollWidget(QWidget *parent)
   hist_frame_->resize(window_canvas_W_, window_canvas_H_);
   hist_layout_ = NULL;
 
-  log_scale_on_ = false;
-  auto_scale_on_ = true;
 }
 
 
@@ -61,38 +59,128 @@ GRIHist1DGridScrollWidget::~GRIHist1DGridScrollWidget() {
 }
 
 
-void GRIHist1DGridScrollWidget::AddHist(GRIHistogrammer *h, QColor qcolor) {
+void GRIHist1DGridScrollWidget::AddHist(GRIHistogrammer *h) {
   // add histogram to list
   gri_hist_vec_.append(h);
-  hist_color_vec_.append(qcolor);
+  hist_xlabel_vec_.append("");
+  hist_ylabel_vec_.append("");
+  hist_foreground_color_vec_.append(Qt::green);
+  hist_background_color_vec_.append(Qt::white);
+  hist_outline_color_vec_.append(Qt::black);
+  hist_logscale_on_vec_.append(false);
+  hist_autoscale_on_vec_.append(true);
   SetDefaultGrid();
 }
 
 
-void GRIHist1DGridScrollWidget::SetColor(GRIHistogrammer *h, QColor qcolor) {
+void GRIHist1DGridScrollWidget::SetXLabel(GRIHistogrammer *h, QString xlabel) {
   if (HistIsPresent(h)) {
-    hist_color_vec_[HistIndex(h)] = qcolor;
+    hist_xlabel_vec_[HistIndex(h)] = xlabel;
   }
   ResetGrid();
 }
 
 
-void GRIHist1DGridScrollWidget::SetColorAll(QColor qcolor) {
-  for (int i = 0; i < hist_color_vec_.size(); ++i) {
-    hist_color_vec_[i] = qcolor;
+void GRIHist1DGridScrollWidget::SetXLabelAll(QString xlabel) {
+  for (int i = 0; i < hist_xlabel_vec_.size(); ++i) {
+    hist_xlabel_vec_[i] = xlabel;
+  }
+  ResetGrid();
+}
+
+
+void GRIHist1DGridScrollWidget::SetYLabel(GRIHistogrammer *h, QString ylabel) {
+  if (HistIsPresent(h)) {
+    hist_ylabel_vec_[HistIndex(h)] = ylabel;
+  }
+  ResetGrid();
+}
+
+
+void GRIHist1DGridScrollWidget::SetYLabelAll(QString ylabel) {
+  for (int i = 0; i < hist_ylabel_vec_.size(); ++i) {
+    hist_ylabel_vec_[i] = ylabel;
+  }
+  ResetGrid();
+}
+
+
+void GRIHist1DGridScrollWidget::SetForegroundColor(GRIHistogrammer *h, QColor qcolor) {
+  if (HistIsPresent(h)) {
+    hist_foreground_color_vec_[HistIndex(h)] = qcolor;
+  }
+  ResetGrid();
+}
+
+
+void GRIHist1DGridScrollWidget::SetForegroundColorAll(QColor qcolor) {
+  for (int i = 0; i < hist_foreground_color_vec_.size(); ++i) {
+    hist_foreground_color_vec_[i] = qcolor;
+  }
+  ResetGrid();
+}
+
+
+void GRIHist1DGridScrollWidget::SetBackgroundColor(GRIHistogrammer *h, QColor qcolor) {
+  if (HistIsPresent(h)) {
+    hist_background_color_vec_[HistIndex(h)] = qcolor;
+  }
+  ResetGrid();
+}
+
+
+void GRIHist1DGridScrollWidget::SetBackgroundColorAll(QColor qcolor) {
+  for (int i = 0; i < hist_background_color_vec_.size(); ++i) {
+    hist_background_color_vec_[i] = qcolor;
+  }
+  ResetGrid();
+}
+
+
+void GRIHist1DGridScrollWidget::SetOutlineColor(GRIHistogrammer *h, QColor qcolor) {
+  if (HistIsPresent(h)) {
+    hist_outline_color_vec_[HistIndex(h)] = qcolor;
+  }
+  ResetGrid();
+}
+
+
+void GRIHist1DGridScrollWidget::SetOutlineColorAll(QColor qcolor) {
+  for (int i = 0; i < hist_outline_color_vec_.size(); ++i) {
+    hist_outline_color_vec_[i] = qcolor;
+  }
+  ResetGrid();
+}
+
+
+void GRIHist1DGridScrollWidget::SetLogScale(GRIHistogrammer *h, bool logscale_on) {
+  if (HistIsPresent(h)) {
+    hist_logscale_on_vec_[HistIndex(h)] = logscale_on;
   }
   ResetGrid();
 }
 
 
 void GRIHist1DGridScrollWidget::SetLogScaleAll(bool logscale_on) {
-  log_scale_on_ = logscale_on;
+  for (int i = 0; i < hist_logscale_on_vec_.size(); ++i) {
+    hist_logscale_on_vec_[i] = logscale_on;
+  }
+  ResetGrid();
+}
+
+
+void GRIHist1DGridScrollWidget::SetAutoScale(GRIHistogrammer *h, bool autoscale_on) {
+  if (HistIsPresent(h)) {
+    hist_autoscale_on_vec_[HistIndex(h)] = autoscale_on;
+  }
   ResetGrid();
 }
 
 
 void GRIHist1DGridScrollWidget::SetAutoScaleAll(bool autoscale_on) {
-  auto_scale_on_ = autoscale_on;
+  for (int i = 0; i < hist_autoscale_on_vec_.size(); ++i) {
+    hist_autoscale_on_vec_[i] = autoscale_on;
+  }
   ResetGrid();
 }
 
@@ -121,13 +209,17 @@ void GRIHist1DGridScrollWidget::ResetGrid() {
          ++col) {
       int ind = row * major_nx_ + col;
       if (ind < gri_hist_vec_.size()) {
-	// make a histogram widget
-	GRIHist1DWidget *histWidg = new GRIHist1DWidget(0, gri_hist_vec_.at(ind),
-                                                        hist_color_vec_.at(ind));
-        histWidg->SetLogScale(log_scale_on_);
-        histWidg->SetAutoScale(auto_scale_on_);
-	hist_widg_disp_vec_.append(histWidg);
-	hist_layout_->addWidget(histWidg,row,col);
+        // make a histogram widget
+        GRIHist1DWidget *histWidg = new GRIHist1DWidget(0, gri_hist_vec_[ind]);
+        histWidg->set_xlabel(hist_xlabel_vec_[ind]);
+        histWidg->set_ylabel(hist_ylabel_vec_[ind]);
+        histWidg->set_foreground_color(hist_foreground_color_vec_[ind]);
+        histWidg->set_background_color(hist_background_color_vec_[ind]);
+        histWidg->set_outline_color(hist_outline_color_vec_[ind]);
+        histWidg->SetLogScale(hist_logscale_on_vec_[ind]);
+        histWidg->SetAutoScale(hist_autoscale_on_vec_[ind]);
+        hist_widg_disp_vec_.append(histWidg);
+        hist_layout_->addWidget(histWidg,row,col);
       }
     }
   }
@@ -203,14 +295,13 @@ void GRIHist1DGridScrollWidget::scrollDown() {
 
 
 bool GRIHist1DGridScrollWidget::HistIsPresent(GRIHistogrammer *h) {
-  bool hist_present = false;
   for (int i = 0; i < gri_hist_vec_.size(); ++i) {
     if ((gri_hist_vec_[i]->get_id() == h->get_id())
-	&& (gri_hist_vec_[i]->get_hist_name() == h->get_hist_name())) {
-      return hist_present;
+        && (gri_hist_vec_[i]->get_hist_name() == h->get_hist_name())) {
+      return true;
     }
   }
-  return hist_present;
+  return false;
 }
 
 
@@ -219,8 +310,8 @@ int GRIHist1DGridScrollWidget::HistIndex(GRIHistogrammer *h) {
     int index = -1;
     for (int i = 0; i < gri_hist_vec_.size(); ++i) {
       if ((gri_hist_vec_[i]->get_id() == h->get_id())
-	  && (gri_hist_vec_[i]->get_hist_name() == h->get_hist_name())) {
-	index = i;
+          && (gri_hist_vec_[i]->get_hist_name() == h->get_hist_name())) {
+        index = i;
       }
     }
     return index;
@@ -264,8 +355,8 @@ void GRIHist1DGridScrollWidget::paintEvent(QPaintEvent *event) {
   points.clear();
   painter.setBrush(Qt::NoBrush);
   painter.drawText(QRect(window_margin_L_, 0,
-			 window_canvas_W_, window_margin_T_),
-		   Qt::AlignCenter, "Move Up");
+                         window_canvas_W_, window_margin_T_),
+                   Qt::AlignCenter, "Move Up");
 
   // Down
   points.append(QPoint(0,height()));
@@ -278,8 +369,8 @@ void GRIHist1DGridScrollWidget::paintEvent(QPaintEvent *event) {
   points.clear();
   painter.setBrush(Qt::NoBrush);
   painter.drawText(QRect(window_margin_L_, height() - window_margin_B_,
-			 window_canvas_W_, window_margin_B_),
-		   Qt::AlignCenter, "Move Down");
+                         window_canvas_W_, window_margin_B_),
+                   Qt::AlignCenter, "Move Down");
 
   // Left
   points.append(QPoint(0,0));
@@ -295,7 +386,7 @@ void GRIHist1DGridScrollWidget::paintEvent(QPaintEvent *event) {
   painter.translate(0,height() - window_margin_B_);
   painter.rotate(-90.);
   painter.drawText(QRect(0,0,window_canvas_H_,window_margin_L_),
-		   Qt::AlignCenter, "Move Left");
+                   Qt::AlignCenter, "Move Left");
   painter.restore();
 
   // Right
@@ -312,7 +403,7 @@ void GRIHist1DGridScrollWidget::paintEvent(QPaintEvent *event) {
   painter.translate(width(),window_margin_T_);
   painter.rotate(90.);
   painter.drawText(QRect(0,0,window_canvas_H_, window_margin_L_),
-		   Qt::AlignCenter, "Move Right");
+                   Qt::AlignCenter, "Move Right");
   painter.restore();
 }
 
@@ -322,19 +413,19 @@ void GRIHist1DGridScrollWidget::mousePressEvent(QMouseEvent *event) {
     int x = event->x();
     int y = event->y();
     if ((0 <= x) && (x <= window_margin_L_)
-	&& (window_margin_T_ <= y) && (y <= height() - window_margin_B_)) {
+        && (window_margin_T_ <= y) && (y <= height() - window_margin_B_)) {
       scrollLeft();
     }
     else if ((width() - window_margin_R_<=x) && (x <= width())
-	     && (window_margin_T_ <= y) && (y <= height() - window_margin_B_)) {
+             && (window_margin_T_ <= y) && (y <= height() - window_margin_B_)) {
       scrollRight();
     }
     else if ((window_margin_L_ <= x) && (x <= width() - window_margin_R_)
-	     && (0 <= y) && ( y<= window_margin_T_)) {
+             && (0 <= y) && ( y<= window_margin_T_)) {
       scrollUp();
     }
     else if ((window_margin_L_ <= x) && (x <= width() - window_margin_R_)
-	     && (height() - window_margin_B_ <= y) && (y <= height())) {
+             && (height() - window_margin_B_ <= y) && (y <= height())) {
       scrollDown();
     }
   }

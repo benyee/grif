@@ -1,5 +1,7 @@
 #include "LynxDAQ.h"
 
+#import "DevCntl.tlb" rename_namespace("DevCntl")
+
 LynxDAQ::LynxDAQ(int num, double min, double max, double rate) {
 }
 
@@ -15,6 +17,16 @@ GRIDAQBaseAccumNode* LynxDAQ::RegisterDataOutput(QString outName) {
     p = new GRIDAQAccumulator<qint64>(outName,1e8,5,250);
   }
   return p;
+}
+
+int LynxDAQ::ConnectToDAQ(){
+    //Open a connection to the device
+    lynx->Open ('10.0.0.7', '10.0.0.3');
+
+    //Display the name of the lynx
+    cout << "You are connected to: " << (lynx->GetParameter (DevCntl::Network_MachineName, (short) 0)) << "\n";
+
+    return 0;
 }
 
 int LynxDAQ::AcquireData(int n) {

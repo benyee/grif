@@ -13,7 +13,7 @@ class LynxDAQ : public GRIDAQThread {
   GRIDAQBaseAccumNode *RegisterDataOutput(QString outName);
 
   // No DAQ to connect to
-  int ConnectToDAQ() { return 0; }
+  int ConnectToDAQ();
 
   // not needed now
   int Initialize() { return 0; }
