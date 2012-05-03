@@ -7,6 +7,31 @@ CONFIG += console
 TARGET = LynxDAQ
 
 
+DEPENDPATH += ../../ . \
+        ./src \
+        ./include \
+        ../../framework/source \
+        ../../framework/include \
+        ../../framework/source/hist \
+        ../../framework/include/hist \
+
+#DEPENDPATH += C:/Canberra/SDK/CPPExamples/Examples/Include
+
+
+INCLUDEPATH += ../../ . \
+        ./include \
+        ../../framework/include \
+        ../../framework/source \
+        ../../framework/source/hist \
+        ../../framework/include/hist \
+
+include(../../framework/source/fsource.pri)
+include(../../framework/include/finclude.pri)
+
+
+QMAKE_CXXFLAGS += -D GRIF_CODE_GENERATION=1 -O3
+
+
 SOURCES += \
     src/main.cpp \
     src/LynxDAQ.cpp \
@@ -15,9 +40,6 @@ SOURCES += \
 HEADERS += \
     include/LynxDAQ.h \
     include/SIMAnalysisThread.h
-
-
-QMAKE_CXXFLAGS += -D GRIF_CODE_GENERATION=1 -O3
 
 ##
 # Please fill in GRIFDIR and ROOTDIR with the appropriate paths
@@ -29,8 +51,10 @@ LYNXDIR = "C:\Canberra\LynxCOM_SDKInstaller"
 
 # run code generation
 GRIFPROJECTDIR = $$GRIFDIR/examples/LynxDAQ
+UTILDIR = $$GRIFDIR/util
+system(cd $$UTILDIR)
+system(python setup.py $$GRIFPROJECTDIR)
 system(cd $$GRIFPROJECTDIR)
-system(python setup.py)
 
 
 GRIF_LOG_DIR = $$GRIFDIR/log/
@@ -42,38 +66,28 @@ DEFINES += GRIF_LOG_DIR=\\\"$${GRIF_LOG_DIR}\\\"
 # External libraries
 INCLUDEPATH += $$GRIFDIR/external
 
-DEPENDPATH += ../../ . \
-        ./src \
-        ./include \
-        ../../framework/source \
-        ../../framework/include \
-        ../../framework/source/hist \
-        ../../framework/include/hist
-
-
-INCLUDEPATH += ../../ . \
-        ./include \
-        ../../framework/include \
-        ../../framework/source \
-        ../../framework/source/hist \
-        ../../framework/include/hist
-
-include(../../framework/source/fsource.pri)
-include(../../framework/include/finclude.pri)
-include(../../framework/source/hist/histsource.pri)
-include(../../framework/include/hist/histinclude.pri)
-
 # ROOT headers
 INCLUDEPATH += $$ROOTDIR/include
 # ROOT libraries
 ROOTSYSLIB += $$ROOTDIR/lib
-INCLUDEPATH += $$ROOTSYSLIB
-LIBS += $$ROOTSYSLIB/libCint.lib
-LIBS += $$ROOTSYSLIB/libMatrix.lib
-LIBS += $$ROOTSYSLIB/libMathCore.lib
-LIBS += -L$$ROOTSYSLIB
-LIBS += -L$$ROOTSYS/lib -llibCore -llibHist
 
+# All *nix systems
+unix|macx {
+    LIBS += -L$$ROOTSYSLIB
+    LIBS += -L$$ROOTSYS/lib -lCore -lHist -lMatrix -lMathCore
+    LIBS += $$ROOTSYSLIB/libCint.so
+    LIBS += $$ROOTSYSLIB/libCore.so
+    LIBS += $$ROOTSYSLIB/libHist.so
+    LIBS += $$ROOTSYSLIB/libMatrix.so
+    LIBS += $$ROOTSYSLIB/libMathCore.so
+}
+# All windows platforms
+win32 {
+    LIBS += -L$$ROOTSYSLIB
+    LIBS += -L$$ROOTSYS/lib -llibCore -llibHist -llibMatrix -llibMathCore -llibCint
+}
+
+#Lynx libraries:
 INCLUDEPATH+= $$LYNXDIR
 LIBS += $$LYNXDIR/1033.lib
 LIBS += $$LYNXDIR/Communications.lib
@@ -84,8 +98,10 @@ LIBS += $$LYNXDIR/OleHlpr.lib
 LIBS += $$LYNXDIR/Serialization.lib
 LIBS += $$LYNXDIR/Utility.lib
 
+#Utilities.h:
 INCLUDEPATH+="C:/Canberra/SDK/CPPExamples/Examples/Include"
 INCLUDEPATH+="C:\Canberra\SDK\CPPExamples\Examples\ExampleList"
+
 
 #Need the following for some of the functions used in Utilities.h:
 LIBS+="C:\Program Files\Microsoft SDKs\Windows\v7.0A\Lib\WS2_32.lib"

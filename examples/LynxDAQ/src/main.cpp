@@ -8,12 +8,12 @@
 #include <QtCore>
 #include <QLinkedList>
 #include <Qt>
-#include "GRICLI.h"
-#include "GRIDefines.h"
-#include "GRILoader.h"
-#include "GRIUserLoader.h"
-#include "GRIMemoryManager.h"
-#include "GRIRegulator.h"
+#include <tools/GRICLI.h>
+#include <core/GRIDefines.h>
+#include <config/GRILoader.h>
+#include <config/GRIUserLoader.h>
+#include <core/GRIMemoryManager.h>
+#include <core/GRIRegulator.h>
 
 using namespace std;
 

@@ -1,7 +1,9 @@
 #ifndef LYNXDAQ_H
 #define LYNXDAQ_H
 
-#include "GRIDAQThread.h"
+#include <core/GRIDAQThread.h>
+#include "Utilities.h"
+//#import "DevCntl.tlb" rename_namespace("DevCntl")
 
 class LynxDAQ : public GRIDAQThread {
  public:
@@ -28,6 +30,7 @@ class LynxDAQ : public GRIDAQThread {
   int StopDataAcquisition() { return 0; }
 
  private:
+  DevCntl::IDevicePtr lynx;
   int npk_;
   int nchan_;
   QDateTime start_time_;
