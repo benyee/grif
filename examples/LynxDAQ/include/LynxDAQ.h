@@ -3,6 +3,7 @@
 
 #include <core/GRIDAQThread.h>
 #include "Utilities.h"
+#include <string>
 //#import "DevCntl.tlb" rename_namespace("DevCntl")
 
 class LynxDAQ : public GRIDAQThread {
@@ -14,14 +15,9 @@ class LynxDAQ : public GRIDAQThread {
 
   GRIDAQBaseAccumNode *RegisterDataOutput(QString outName);
 
-  // No DAQ to connect to
   int ConnectToDAQ();
-
-  // not needed now
-  int Initialize() { return 0; }
-
-  // not needed now
-  int LoadConfiguration() { return 0; }
+  int Initialize();
+  int LoadConfiguration();
 
   //Called at the beginning each run.
   int StartDataAcquisition();
@@ -30,6 +26,7 @@ class LynxDAQ : public GRIDAQThread {
   int StopDataAcquisition() { return 0; }
 
  private:
+  long input;
   DevCntl::IDevicePtr lynx;
   int npk_;
   int nchan_;
@@ -40,6 +37,9 @@ class LynxDAQ : public GRIDAQThread {
   bool init_ready_;
   time_t last_time_;
   QVector<time_t> times_;
+  void TurnOnHV(long V);
+  void TurnOnHV(){TurnOnHV((long)5000);}
+  void TurnOffHV();
 };
 
 #endif  // LYNXDAQ_H
