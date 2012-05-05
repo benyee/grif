@@ -1,10 +1,13 @@
 #ifndef LYNXDAQ_H
 #define LYNXDAQ_H
 
+#define LYNX_IPADDRESS L"10.0.0.3"
+#define LYNX_DEFAULT 1
+
 #include <core/GRIDAQThread.h>
 #include "Utilities.h"
 #include <string>
-//#import "DevCntl.tlb" rename_namespace("DevCntl")
+#import "DevCntl.tlb" rename_namespace("DevCntl")
 
 class LynxDAQ : public GRIDAQThread {
  public:
@@ -16,18 +19,18 @@ class LynxDAQ : public GRIDAQThread {
   GRIDAQBaseAccumNode *RegisterDataOutput(QString outName);
 
   int ConnectToDAQ();
-  int Initialize();
   int LoadConfiguration();
-
-  //Called at the beginning each run.
+  int Initialize();
   int StartDataAcquisition();
-
-  //not needed now, called at the end of each run.
-  int StopDataAcquisition() { return 0; }
+  int StopDataAcquisition();
 
  private:
   long input;
   DevCntl::IDevicePtr lynx;
+  VARIANT Args;  
+  ULONG Status;
+  variant_t timeBase;
+
   int npk_;
   int nchan_;
   QDateTime start_time_;
@@ -37,6 +40,8 @@ class LynxDAQ : public GRIDAQThread {
   bool init_ready_;
   time_t last_time_;
   QVector<time_t> times_;
+
+  void LoadDefaultConfigs();
   void TurnOnHV(long V);
   void TurnOnHV(){TurnOnHV((long)5000);}
   void TurnOffHV();
