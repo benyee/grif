@@ -31,15 +31,8 @@ class LynxDAQ : public GRIDAQThread {
   ULONG Status;
   variant_t timeBase;
 
-  int npk_;
-  int nchan_;
   QDateTime start_time_;
   QDateTime prev_time_;
-  QList<peak*> pk_;
-  QList<background*> bkg_;
-  bool init_ready_;
-  time_t last_time_;
-  QVector<time_t> times_;
 
   void LoadDefaultConfigs();
   void TurnOnHV(long V);

@@ -14,7 +14,8 @@ using namespace std;
 
 int main()
 {
-    DevCntl::IDevicePtr lynx = Utilities::Device ();
+
+    DevCntl::IDevicePtr lynx = Utilities::Device();
 
     //Name of output file:
     string filename = "output.txt";

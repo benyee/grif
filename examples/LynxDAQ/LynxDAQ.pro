@@ -47,7 +47,7 @@ HEADERS += \
 GRIFDIR =C:/grif
 # Directory of ROOT on your machine:
 ROOTDIR =C:/root
-LYNXDIR = "C:\Canberra\LynxCOM_SDKInstaller"
+LYNXDIR = "C:/Canberra/LynxCOM_SDKInstaller"
 
 # run code generation
 GRIFPROJECTDIR = $$GRIFDIR/examples/LynxDAQ
@@ -100,11 +100,11 @@ LIBS += $$LYNXDIR/Utility.lib
 
 #Utilities.h:
 INCLUDEPATH+="C:/Canberra/SDK/CPPExamples/Examples/Include"
-INCLUDEPATH+="C:\Canberra\SDK\CPPExamples\Examples\ExampleList"
+INCLUDEPATH+="C:/Canberra/SDK/CPPExamples/Examples/ExampleList"
 
 
 #Need the following for some of the functions used in Utilities.h:
-LIBS+="C:\Program Files\Microsoft SDKs\Windows\v7.0A\Lib\WS2_32.lib"
-LIBS+="C:\Program Files\Microsoft SDKs\Windows\v7.0A\Lib\IPHlpApi.lib"
+LIBS+="C:/Program Files/Microsoft SDKs/Windows/v7.0A/Lib/WS2_32.lib"
+LIBS+="C:/Program Files/Microsoft SDKs/Windows/v7.0A/Lib/IPHlpApi.lib"
 
 

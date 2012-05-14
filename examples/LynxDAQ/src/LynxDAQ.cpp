@@ -10,6 +10,7 @@ LynxDAQ::LynxDAQ(int num, double min, double max, double rate) {
 }
 
 LynxDAQ::~LynxDAQ() {
+    delete(lynx);
 }
 
 
@@ -101,7 +102,7 @@ int LynxDAQ::Initialize(){
 int LynxDAQ::StartDataAcquisition() {
   start_time_ = QDateTime::currentDateTime();
   prev_time_ = start_time_;
-  InitializeAccumulators(start_time_,0,1e8,4,250);
+  InitializeAccumulators(start_time_,0);
 
   //Clear the memory and start the acquisition
   lynx->Control (DevCntl::Clear, input, &Args);
@@ -114,8 +115,7 @@ int LynxDAQ::AcquireData(int n) {
     //While acquiring display acquisition info
 
     //If either busy and waiting or waiting and waiting
-    cout<<(0 != (DevCntl::Busy & Status))<<(0 != (DevCntl::Waiting & Status))<<!HIBYTE(GetAsyncKeyState(VK_ESCAPE))<<endl;
-    if(((0 != (DevCntl::Busy & Status))|| (0 != (DevCntl::Waiting & Status))) && !HIBYTE(GetAsyncKeyState(VK_ESCAPE))){
+     if(((0 != (DevCntl::Busy & Status))|| (0 != (DevCntl::Waiting & Status))) && !HIBYTE(GetAsyncKeyState(VK_ESCAPE))){
         cout<<"Inside the if statement"<<endl;
         Status=(ULONG) lynx->GetParameter (DevCntl::Input_Status, input);
 
@@ -127,13 +127,13 @@ int LynxDAQ::AcquireData(int n) {
 
         //See which date was received and present it
         long inputMode = (LONG) lynx->GetParameter (DevCntl::Input_Mode, input);
-        if (inputMode == DevCntl::List && !((bool) vMode))
+        if (0)//(inputMode == DevCntl::List && !((bool) vMode))
         {
             variant_t listD = Utilities::Get1DSafeArrayElement (listB, 6);
             for (int i = 0; i < Utilities::GetCount (listD); i++)
                 cout << "Event: "  << Utilities::GetString ((bstr_t)(Utilities::Get1DSafeArrayElement (listD, i))) <<"\n";
         }
-        else if (inputMode == DevCntl::Tlist && ((bool) vMode))
+        else if (1)//(inputMode == DevCntl::Tlist && ((bool) vMode))
         {
             variant_t tlistD = Utilities::Get1DSafeArrayElement (listB, 6);
             LONG numE = Utilities::GetCount (tlistD);
@@ -172,8 +172,8 @@ int LynxDAQ::AcquireData(int n) {
             }
 
             //Dummy data:
-            PostData<double>(numE/2, "ADCOutput",dummyADC,dummy_ts);
-            PostData<qint64>(numE/2, "TS",dummy_ts,dummy_ts);
+            //PostData<double>(numE/2, "ADCOutput",dummyADC,dummy_ts);
+            //PostData<qint64>(numE/2, "TS",dummy_ts,dummy_ts);
         }
     }
   return 0;
