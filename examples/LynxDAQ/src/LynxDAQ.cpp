@@ -5,8 +5,8 @@ LynxDAQ::LynxDAQ(int num, double min, double max, double rate) {
     lynx = Utilities::Device();
     input = 1;
     VariantInit (&Args);
-    Status=DevCntl::Waiting;
 
+    packNum = 0;
 }
 
 LynxDAQ::~LynxDAQ() {
@@ -112,70 +112,67 @@ int LynxDAQ::StartDataAcquisition() {
 }
 
 int LynxDAQ::AcquireData(int n) {
-    //While acquiring display acquisition info
-
-    //If either busy and waiting or waiting and waiting
-     if(((0 != (DevCntl::Busy & Status))|| (0 != (DevCntl::Waiting & Status))) && !HIBYTE(GetAsyncKeyState(VK_ESCAPE))){
-        cout<<"Inside the if statement"<<endl;
-        Status=(ULONG) lynx->GetParameter (DevCntl::Input_Status, input);
 
         //Get the list data
         variant_t listB = lynx->GetListData (input);
 
-        variant_t vMode = Utilities::Get1DSafeArrayElement (listB, 0);
+        //Set the proper time base:
         timeBase=Utilities::Get1DSafeArrayElement (listB, 4);
+        double cnv = (double)timeBase/1000; //Convert to uS
 
-        //See which date was received and present it
-        long inputMode = (LONG) lynx->GetParameter (DevCntl::Input_Mode, input);
-        if (0)//(inputMode == DevCntl::List && !((bool) vMode))
-        {
-            variant_t listD = Utilities::Get1DSafeArrayElement (listB, 6);
-            for (int i = 0; i < Utilities::GetCount (listD); i++)
-                cout << "Event: "  << Utilities::GetString ((bstr_t)(Utilities::Get1DSafeArrayElement (listD, i))) <<"\n";
-        }
-        else if (1)//(inputMode == DevCntl::Tlist && ((bool) vMode))
-        {
-            variant_t tlistD = Utilities::Get1DSafeArrayElement (listB, 6);
-            LONG numE = Utilities::GetCount (tlistD);
-            double* dummyADC = new double[numE/2];
-            qint64* dummy_ts = new qint64[numE/2];
-            static const long ROLLOVERBIT=0x00008000;
-            static unsigned __int64 RolloverTime=0;
-            unsigned short recTime=0, recEvent=0;
-            unsigned __int64 Time=0;
-            LONG i=0;
+        variant_t tlistD = Utilities::Get1DSafeArrayElement (listB, 6);
+        LONG numE = Utilities::GetCount (tlistD);
+        static const long ROLLOVERBIT=0x00008000;
+        static unsigned __int64 RolloverTime=0;
+        unsigned short recTime=0, recEvent=0;
+        unsigned __int64 Time=0;
+        LONG i=0;
+        LONG j=0;
 
-            double cnv = (double)timeBase/1000; //Convert to uS
+        vector<double> dummyADC(numE/2);
+        vector<unsigned __int64> dummy_ts(numE/2);
 
-            for(Time=0, i=0; i<numE; i+=2) {
-                recEvent = Utilities::Get1DSafeArrayElement (tlistD, i);
-                recTime = Utilities::Get1DSafeArrayElement (tlistD, i + 1);
 
-                if (!(recTime&ROLLOVERBIT)) {
-                    Time = RolloverTime | (recTime & 0x7FFF);
-                }
-                else {
-                    long LSBofTC = 0;
-                    long MSBofTC = 0;
-                    LSBofTC |= (recTime & 0x7FFF) << 15;
-                    MSBofTC |= recEvent << 30;
-                    RolloverTime = MSBofTC | LSBofTC;
+        for(Time=0, i=0; i<numE; i+=2) {
+            recEvent = Utilities::Get1DSafeArrayElement (tlistD, i);
+            recTime = Utilities::Get1DSafeArrayElement (tlistD, i + 1);
 
-                    //goto next event
-                    continue;
-                }
+            if (!(recTime&ROLLOVERBIT)) {
+                Time = RolloverTime | (recTime & 0x7FFF);
+            }
+            else {
+                long LSBofTC = 0;
+                long MSBofTC = 0;
+                LSBofTC |= (recTime & 0x7FFF) << 15;
+                MSBofTC |= recEvent << 30;
+                RolloverTime = MSBofTC | LSBofTC;
 
-                cout << "\nEvent: " << recEvent << "; Time (uS): " << Time*cnv << endl;
-                dummyADC[i/2] = (double)recEvent;
-                dummy_ts[i/2] = (qint64)Time*cnv;
-                Time=0;
+                //goto next event
+                continue;
             }
 
-            //Dummy data:
-            //PostData<double>(numE/2, "ADCOutput",dummyADC,dummy_ts);
-            //PostData<qint64>(numE/2, "TS",dummy_ts,dummy_ts);
+            dummyADC[j/2] = (double)recEvent;
+            dummy_ts[j/2] = (unsigned __int64)(Time*cnv);
+            Time=0;
+            j+=2;
         }
-    }
+
+        dummyADC.resize(j/2);
+        dummy_ts.resize(j/2);
+        qint64* packNums = new qint64[j/2];
+        for (int k = 0; k < j/2; k++){
+            packNums[k]=packNum;
+        }
+
+        //Dummy data:
+        PostData<double>(j/2, "ADCOutput",&dummyADC[0],packNums);
+        PostData<unsigned __int64>(j/2, "TS",&dummy_ts[0],packNums);
+
+
+        delete [] packNums;
+        //packNum keeps track of how many packets we've sent using PostData,
+        packNum++;
+    //}
   return 0;
 }
 

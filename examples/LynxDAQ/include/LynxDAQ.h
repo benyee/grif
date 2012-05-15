@@ -27,12 +27,13 @@ class LynxDAQ : public GRIDAQThread {
  private:
   long input;
   DevCntl::IDevicePtr lynx;
-  VARIANT Args;  
-  ULONG Status;
+  VARIANT Args;
   variant_t timeBase;
 
   QDateTime start_time_;
   QDateTime prev_time_;
+
+  qint64 packNum;
 
   void LoadDefaultConfigs();
   void TurnOnHV(long V);
