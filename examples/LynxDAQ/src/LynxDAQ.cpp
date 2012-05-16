@@ -7,6 +7,8 @@ LynxDAQ::LynxDAQ(int num, double min, double max, double rate) {
     VariantInit (&Args);
 
     packNum = 0;
+    isAcquiring = false;
+    isConnected = false;
 }
 
 LynxDAQ::~LynxDAQ() {
@@ -39,9 +41,10 @@ int LynxDAQ::ConnectToDAQ(){
 
         //Gain ownership
         lynx->LockInput (_bstr_t("administrator"), _bstr_t("password"), input);
-        cout<<"gained ownership"<<endl;
+        cout<<"Gained ownership."<<endl;
+        isConnected() = true;
         Utilities::disableAcquisition(lynx, input);
-        cout<<"disabled acq"<<endl;
+        cout<<"Disabled acquisition."<<endl;
     }catch(int e){
     }
     return 0;
@@ -101,85 +104,87 @@ int LynxDAQ::Initialize(){
 
 int LynxDAQ::StartDataAcquisition() {
   start_time_ = QDateTime::currentDateTime();
-  prev_time_ = start_time_;
   InitializeAccumulators(start_time_,0);
 
   //Clear the memory and start the acquisition
   lynx->Control (DevCntl::Clear, input, &Args);
   lynx->Control (DevCntl::Start, input, &Args);
 
+  isAcquiring = true;
+
   return 0;
 }
 
 int LynxDAQ::AcquireData(int n) {
 
-        //Get the list data
-        variant_t listB = lynx->GetListData (input);
+    //Get the list data
+    variant_t listB = lynx->GetListData (input);
 
-        //Set the proper time base:
-        timeBase=Utilities::Get1DSafeArrayElement (listB, 4);
-        double cnv = (double)timeBase/1000; //Convert to uS
+    //Set the proper time base:
+    timeBase=Utilities::Get1DSafeArrayElement (listB, 4);
+    double cnv = (double)timeBase/1000; //Convert to uS
 
-        variant_t tlistD = Utilities::Get1DSafeArrayElement (listB, 6);
-        LONG numE = Utilities::GetCount (tlistD);
-        static const long ROLLOVERBIT=0x00008000;
-        static unsigned __int64 RolloverTime=0;
-        unsigned short recTime=0, recEvent=0;
-        unsigned __int64 Time=0;
-        LONG i=0;
-        LONG j=0;
+    variant_t tlistD = Utilities::Get1DSafeArrayElement (listB, 6);
+    LONG numE = Utilities::GetCount (tlistD);
+    static const long ROLLOVERBIT=0x00008000;
+    static unsigned __int64 RolloverTime=0;
+    unsigned short recTime=0, recEvent=0;
+    unsigned __int64 Time=0;
+    LONG i=0;
+    LONG j=0;
 
-        vector<double> dummyADC(numE/2);
-        vector<unsigned __int64> dummy_ts(numE/2);
+    vector<double> dummyADC(numE/2);
+    vector<unsigned __int64> dummy_ts(numE/2);
 
 
-        for(Time=0, i=0; i<numE; i+=2) {
-            recEvent = Utilities::Get1DSafeArrayElement (tlistD, i);
-            recTime = Utilities::Get1DSafeArrayElement (tlistD, i + 1);
+    for(Time=0, i=0; i<numE; i+=2) {
+        recEvent = Utilities::Get1DSafeArrayElement (tlistD, i);
+        recTime = Utilities::Get1DSafeArrayElement (tlistD, i + 1);
 
-            if (!(recTime&ROLLOVERBIT)) {
-                Time = RolloverTime | (recTime & 0x7FFF);
-            }
-            else {
-                long LSBofTC = 0;
-                long MSBofTC = 0;
-                LSBofTC |= (recTime & 0x7FFF) << 15;
-                MSBofTC |= recEvent << 30;
-                RolloverTime = MSBofTC | LSBofTC;
+        if (!(recTime&ROLLOVERBIT)) {
+            Time = RolloverTime | (recTime & 0x7FFF);
+        }
+        else {
+            long LSBofTC = 0;
+            long MSBofTC = 0;
+            LSBofTC |= (recTime & 0x7FFF) << 15;
+            MSBofTC |= recEvent << 30;
+            RolloverTime = MSBofTC | LSBofTC;
 
-                //goto next event
-                continue;
-            }
-
-            dummyADC[j/2] = (double)recEvent;
-            dummy_ts[j/2] = (unsigned __int64)(Time*cnv);
-            Time=0;
-            j+=2;
+            //goto next event
+            continue;
         }
 
-        dummyADC.resize(j/2);
-        dummy_ts.resize(j/2);
-        qint64* packNums = new qint64[j/2];
-        for (int k = 0; k < j/2; k++){
-            packNums[k]=packNum;
-        }
+        dummyADC[j/2] = (double)recEvent;
+        dummy_ts[j/2] = (unsigned __int64)(Time*cnv);
+        Time=0;
+        j+=2;
+    }
 
-        //Dummy data:
-        PostData<double>(j/2, "ADCOutput",&dummyADC[0],packNums);
-        PostData<unsigned __int64>(j/2, "TS",&dummy_ts[0],packNums);
+    dummyADC.resize(j/2);
+    dummy_ts.resize(j/2);
+    qint64* packNums = new qint64[j/2];
+    for (int k = 0; k < j/2; k++){
+        packNums[k]=packNum;
+    }
+
+    //Dummy data:
+    PostData<double>(j/2, "ADCOutput",&dummyADC[0],packNums);
+    PostData<unsigned __int64>(j/2, "TS",&dummy_ts[0],packNums);
 
 
-        delete [] packNums;
-        //packNum keeps track of how many packets we've sent using PostData,
-        packNum++;
-    //}
-  return 0;
+    delete [] packNums;
+    //packNum keeps track of how many packets we've sent using PostData,
+    packNum++;
+    return 0;
 }
 
 int LynxDAQ::StopDataAcquisition(){
-    cout<<"inside stop data acquisition"<<endl;
+    cout<<"About to disable acquisition..."<<endl;
     Utilities::disableAcquisition(lynx, input);
-    cout<<"disabled acq"<<endl;
+    cout<<"Disabled Acquisition"<<endl;
+
+    isAcquiring = false;
     return 0;
 }
 
@@ -204,7 +209,6 @@ void LynxDAQ::LoadDefaultConfigs(){
     variant_t presetMode = variant_t (DevCntl::PresetNone);
     lynx->PutParameter (DevCntl::Preset_Options, input, &presetMode);
 }
-
 void LynxDAQ::TurnOnHV(long v){
     //Turn on HV
     variant_t voltageStatus = VARIANT_TRUE;
@@ -217,13 +221,26 @@ void LynxDAQ::TurnOnHV(long v){
     //Wait till ramped
     while(VARIANT_TRUE == (VARIANT_BOOL)(variant_t)(lynx->GetParameter (DevCntl::Input_VoltageRamping, input)))
     {
-        cout << "HVPS is ramping...\n";
+        cout << "HVPS is ramping... voltage is at "<<HV()<<endl;
         Sleep (500);
     }
 }
-
 void LynxDAQ::TurnOffHV(){
     //Turn off HV
     variant_t voltageStatus = VARIANT_FALSE;
     lynx->PutParameter (DevCntl::Input_VoltageStatus, input, &voltageStatus);
 }
+int LynxDAQ::IsHVOn(){
+    if(VARIANT_TRUE == (VARIANT_BOOL)(variant_t)(lynx ->GetParameter(DevCntl::Input_VoltageStatus,input))){
+        if(VARIANT_TRUE == (VARIANT_BOOL)(variant_t)(lynx->GetParameter (DevCntl::Input_VoltageRamping, input))){
+            return 2;
+        }
+        return 1;
+    }
+    return 0;
+}
+double LynxDAQ::HV(){
+    volt = lynx->GetParameter(DevCntl::Input_VoltageReading, input);
+    return (double)volt;
+}
+

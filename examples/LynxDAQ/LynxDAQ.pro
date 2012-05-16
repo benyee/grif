@@ -35,11 +35,13 @@ QMAKE_CXXFLAGS += -D GRIF_CODE_GENERATION=1 -O3
 SOURCES += \
     src/main.cpp \
     src/LynxDAQ.cpp \
-    src/SIMAnalysisThread.cpp
+    src/SIMAnalysisThread.cpp \
+    src/ActivityCounter.cpp
 
 HEADERS += \
     include/LynxDAQ.h \
-    include/SIMAnalysisThread.h
+    include/SIMAnalysisThread.h \
+    include/ActivityCounter.h
 
 ##
 # Please fill in GRIFDIR and ROOTDIR with the appropriate paths
