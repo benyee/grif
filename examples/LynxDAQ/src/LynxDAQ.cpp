@@ -42,7 +42,7 @@ int LynxDAQ::ConnectToDAQ(){
         //Gain ownership
         lynx->LockInput (_bstr_t("administrator"), _bstr_t("password"), input);
         cout<<"Gained ownership."<<endl;
-        isConnected() = true;
+        isConnected = true;
         Utilities::disableAcquisition(lynx, input);
         cout<<"Disabled acquisition."<<endl;
     }catch(int e){

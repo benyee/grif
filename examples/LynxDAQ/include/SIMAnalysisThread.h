@@ -25,15 +25,17 @@
 
 #include <core/GRIAnalysisThread.h>
 #include "QFile"
+#include "ActivityCounter.h"
 
 class SIMAnalysisThread : public GRIAnalysisThread {
  public:
-  SIMAnalysisThread();
-  ~SIMAnalysisThread();
+    SIMAnalysisThread();
+    ~SIMAnalysisThread();
 
-  int Analyze();
+    int Analyze();
 
  private:
+    ActivityCounter* RatePlotter;
 };
 
 #endif  // GRIF_EXAMPLES_SIMULATOR_SIMANALYSISTHREAD_H_

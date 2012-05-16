@@ -24,25 +24,46 @@
 #include "SIMAnalysisThread.h"
 
 SIMAnalysisThread::SIMAnalysisThread() {
+    RatePlotter = new ActivityCounter(0,1000);
 }
 
 SIMAnalysisThread::~SIMAnalysisThread() {
 }
 
 int SIMAnalysisThread::Analyze() {
-  double* ADC;
-  unsigned __int64* ts;
-  int nADC;
+    double* ADC;
+    unsigned __int64* ts;
+    int nADC;
 
-  QPair<int, double*> pADC = ReadData<double>("LynxDAQ","ADCOutput");
-  ADC = pADC.second; nADC = pADC.first;
+    QPair<int, double*> pADC = ReadData<double>("LynxDAQ","ADCOutput");
+    ADC = pADC.second; nADC = pADC.first;
 
-  QPair<int, unsigned __int64*> pTS = ReadData<unsigned __int64>("LynxDAQ","TS");
-  ts = pTS.second;
+    QPair<int, unsigned __int64*> pTS = ReadData<unsigned __int64>("LynxDAQ","TS");
+    ts = pTS.second;
 
-  for(int i = 0; i<nADC; i++){
+    for(int i = 0; i<nADC; i++){
       std::cout << "\nEvent: " << ADC[i]<< "; Time (uS): " << ts[i]<< endl;
-  }
-  return 0;
+    }
+
+    //This doesn't really do anything yet:
+    double* ts_darray = (double*)ts;
+    std::vector<double> ADC_vec(ADC,ADC + sizeof ADC/sizeof ADC[0]);
+    std::vector<double> ts_vec(ts_darray,ts_darray + sizeof ts_darray/sizeof ts_darray[0]);
+
+    RatePlotter->addData(ADC_vec,ts_vec);
+    RatePlotter->computeRate();
+
+    QPair<std::vector<double>,std::vector<double> > activity = RatePlotter->getPlotData();
+    std::vector<double> e = activity.first;
+    std::vector<double> t = activity.second;
+    std::vector<double>::iterator itr_e = e.begin();
+    std::vector<double>::iterator itr_t = t.begin();
+    for(itr_e = e.begin(); itr_e < e.end(); itr_e++){
+        std::cout<<"The rate at time "<<*itr_t<<" is "<<*itr_e<<endl;
+        itr_t++;
+    }
+    RatePlotter->clearData();
+
+    return 0;
 }
 
