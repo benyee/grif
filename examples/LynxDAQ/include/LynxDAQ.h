@@ -31,12 +31,12 @@ class LynxDAQ : public GRIDAQThread {
   int IsHVOn(); //Returns 0 if off, 1 if on, 2 if ramping
   double HV(); //Returns current value of the voltage
 
+  bool IsConnected(){return isConnected;}
   bool IsAcquiring(){return isAcquiring;}
   //Return real and live times in seconds:
   double RealTime(){return (double)DevCntl::Elapsed_Live/100000;}
   double LiveTime(){return (double)DevCntl::Elapsed_Real/100000;}
 
-  bool IsConnected(){return isConnected;}
 
  private:
   long input;
@@ -47,8 +47,6 @@ class LynxDAQ : public GRIDAQThread {
   QDateTime start_time_;
   bool isConnected;
   bool isAcquiring;
-  double volt; //Current voltage level
-  qint64 packNum;
 
 };
 

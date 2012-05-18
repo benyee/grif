@@ -24,7 +24,7 @@
 #include "SIMAnalysisThread.h"
 
 SIMAnalysisThread::SIMAnalysisThread() {
-    RatePlotter = new ActivityCounter(0,1000);
+    RatePlotter = new ActivityCounter(0,8000,500000);
 }
 
 SIMAnalysisThread::~SIMAnalysisThread() {
@@ -32,37 +32,38 @@ SIMAnalysisThread::~SIMAnalysisThread() {
 
 int SIMAnalysisThread::Analyze() {
     double* ADC;
-    unsigned __int64* ts;
+    qint64* ts;
     int nADC;
 
     QPair<int, double*> pADC = ReadData<double>("LynxDAQ","ADCOutput");
     ADC = pADC.second; nADC = pADC.first;
 
-    QPair<int, unsigned __int64*> pTS = ReadData<unsigned __int64>("LynxDAQ","TS");
+    QPair<int, qint64*> pTS = ReadData<qint64>("LynxDAQ","TS");
     ts = pTS.second;
 
     for(int i = 0; i<nADC; i++){
-      std::cout << "\nEvent: " << ADC[i]<< "; Time (uS): " << ts[i]<< endl;
+       std::cout << "Event: " << ADC[i]<< "; Time (uS): " << ts[i]<< std::endl;
     }
 
-    //This doesn't really do anything yet:
-    double* ts_darray = (double*)ts;
-    std::vector<double> ADC_vec(ADC,ADC + sizeof ADC/sizeof ADC[0]);
-    std::vector<double> ts_vec(ts_darray,ts_darray + sizeof ts_darray/sizeof ts_darray[0]);
+    std::cout<<"Read it with nADC = "<<nADC<<std::endl;
 
-    RatePlotter->addData(ADC_vec,ts_vec);
-    RatePlotter->computeRate();
+    std::cout<<"\n"<<sizeof ADC<<"..."<<sizeof ts<<" are the sizes"<<std::endl;
 
-    QPair<std::vector<double>,std::vector<double> > activity = RatePlotter->getPlotData();
+
+    RatePlotter->addData(nADC,ADC,ts);
+
+    QPair<std::vector<double>,std::vector<qint64> > activity = RatePlotter->getPlotData();
     std::vector<double> e = activity.first;
-    std::vector<double> t = activity.second;
+    std::vector<qint64> t = activity.second;
+    std::cout<<"\n"<<e.size()<<"..."<<t.size()<<" are the sizes"<<std::endl;
     std::vector<double>::iterator itr_e = e.begin();
-    std::vector<double>::iterator itr_t = t.begin();
+    std::vector<qint64>::iterator itr_t = t.begin();
     for(itr_e = e.begin(); itr_e < e.end(); itr_e++){
-        std::cout<<"The rate at time "<<*itr_t<<" is "<<*itr_e<<endl;
+        std::cout<<"The rate at time "<<*itr_t<<" is "<<*itr_e<<std::endl;
         itr_t++;
     }
-    RatePlotter->clearData();
+
+    std::cout<<"Analyzed"<<std::endl;
 
     return 0;
 }

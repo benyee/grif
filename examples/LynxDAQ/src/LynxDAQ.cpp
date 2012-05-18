@@ -6,7 +6,6 @@ LynxDAQ::LynxDAQ(int num, double min, double max, double rate) {
     input = 1;
     VariantInit (&Args);
 
-    packNum = 0;
     isAcquiring = false;
     isConnected = false;
 }
@@ -131,10 +130,9 @@ int LynxDAQ::AcquireData(int n) {
     unsigned short recTime=0, recEvent=0;
     unsigned __int64 Time=0;
     LONG i=0;
-    LONG j=0;
 
-    vector<double> dummyADC(numE/2);
-    vector<unsigned __int64> dummy_ts(numE/2);
+    vector<double> ADC;
+    vector<qint64> ts;
 
 
     for(Time=0, i=0; i<numE; i+=2) {
@@ -155,27 +153,16 @@ int LynxDAQ::AcquireData(int n) {
             continue;
         }
 
-        dummyADC[j/2] = (double)recEvent;
-        dummy_ts[j/2] = (unsigned __int64)(Time*cnv);
+        ADC.push_back((double)recEvent);
+        ts.push_back((qint64)(Time*cnv));
         Time=0;
-        j+=2;
+        cout << "Event: " << ADC.back()<< "; Time (uS): " << ts.back()<< " (LynxDAQ)"<<endl;
     }
 
-    dummyADC.resize(j/2);
-    dummy_ts.resize(j/2);
-    qint64* packNums = new qint64[j/2];
-    for (int k = 0; k < j/2; k++){
-        packNums[k]=packNum;
-    }
+    PostData<double>(ADC.size(), "ADCOutput",&ADC[0],&ts[0]);
+    PostData<qint64>(ADC.size(), "TS",&ts[0],&ts[0]);
+    cout<<"Just posted"<<endl;
 
-    //Dummy data:
-    PostData<double>(j/2, "ADCOutput",&dummyADC[0],packNums);
-    PostData<unsigned __int64>(j/2, "TS",&dummy_ts[0],packNums);
-
-
-    delete [] packNums;
-    //packNum keeps track of how many packets we've sent using PostData,
-    packNum++;
     return 0;
 }
 
@@ -240,7 +227,7 @@ int LynxDAQ::IsHVOn(){
     return 0;
 }
 double LynxDAQ::HV(){
-    volt = lynx->GetParameter(DevCntl::Input_VoltageReading, input);
+    double volt = lynx->GetParameter(DevCntl::Input_VoltageReading, input);
     return (double)volt;
 }
 

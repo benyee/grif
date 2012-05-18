@@ -27,12 +27,11 @@ int main(int argc, char* argv[])
     GRILoader *loader = new GRIUserLoader(reg);
     loader->InitRegulatorDetails();
     reg->Start();
-    GRISleep::msleep(3000);
+    GRISleep::msleep(60000);
     reg->Stop();
-    GRISleep::msleep(5000);
+    GRISleep::msleep(15000);
     std::cout << "done..." << std::endl;
 
-    cout << "Hello World!" << endl;
     return 0;
 }
 

@@ -3,38 +3,44 @@
 
 #include <vector>
 #include <QPair>
+#include <iostream>
 
 class ActivityCounter{
 public:
-    ActivityCounter(int input_ROIL, int input_ROIR,double input_currtime = 0,double input_dt = 1);
+    ActivityCounter(int input_ROIL, int input_ROIR,double input_dt,double input_currtime = 0);
     ~ActivityCounter();
 
-    void setBinRate(double x){dt = x;}
-    double getBinRate(){return dt;}
+    void setTimeStep(double x){dt = x;}
+    double getTimeStep(){return dt;}
+    void setTime(double x){currtime = x;}
 
     void resetLROI(int x){leftROI = x;}
     void resetRROI(int x){rightROI = x;}
     int* getROI(){int out[2] = {leftROI,rightROI}; return out;}
 
-    QPair<std::vector<double>,std::vector<double> > getRawData();
-    QPair<std::vector<double>,std::vector<double> > getPlotData();
+    //Returns the activity and corresponding times as vectors.
+    QPair<std::vector<double>,std::vector<qint64> > getPlotData();
 
-    void addData(std::vector<double> e, std::vector<double> t);
-    void computeRate();
-    void clearData();
+    //Incorporates new data into the counter.
+    //  numE is the length of e and t.
+    //  e is the event energy or bin number. (same units as leftROI and rightROI)
+    //  t is the timestamp of the corresponding element in e  (same units as dt, currtime)
+    void addData(int numE, double* e, qint64* t);
+
+    //Clears the stored data.  Note that this does not reset the counter for the current
+    //  time window, nor does it reset the current time variable.
+    void clearData(){rate.resize(0); time.resize(0);}
 
 private:
     int leftROI;
     int rightROI;
 
     double dt;
-    double currtime;
+    double currtime; //Arbitrary time counter, should be in same units as dt and your input timestamps.
+    int count; //# of counts in the current time interval (between currtime and currtime+dt)
 
-    std::vector<double> energy;
-    std::vector<double> timestamp;
-
-    std::vector<double> rate;
-    std::vector<double> time;
+    std::vector<double> rate; //List of activity data points
+    std::vector<qint64> time; //Times associated with rate vector.  (Center time of each time interval.)
 
 };
 
