@@ -11,7 +11,7 @@
 
 class LynxDAQ : public GRIDAQThread {
  public:
-  LynxDAQ(int num=1, double min=0, double max=65535, double rate=1);
+  LynxDAQ();
   ~LynxDAQ();
 
   int AcquireData(int n);
@@ -23,7 +23,6 @@ class LynxDAQ : public GRIDAQThread {
   int Initialize();
   int StartDataAcquisition();
   int StopDataAcquisition();
-  void LoadDefaultConfigs();
 
   void TurnOnHV(long V);
   void TurnOnHV(){TurnOnHV((long)5000);}
@@ -32,22 +31,24 @@ class LynxDAQ : public GRIDAQThread {
   double HV(); //Returns current value of the voltage
 
   bool IsConnected(){return isConnected;}
-  bool IsAcquiring(){return isAcquiring;}
+  bool IsAcquiring(){return (LiveTime()-currLiveTime>0.01);}
   //Return real and live times in seconds:
-  double RealTime(){return (double)DevCntl::Elapsed_Live/100000;}
-  double LiveTime(){return (double)DevCntl::Elapsed_Real/100000;}
+  double LiveTime(){return (double)lynx->GetParameter(DevCntl::Elapsed_Live, input);}
+  double RealTime(){return (double)lynx->GetParameter(DevCntl::Elapsed_Real, input);}
 
 
  private:
   long input;
+  double currLiveTime;
+  double currRealTime;
   DevCntl::IDevicePtr lynx;
   VARIANT Args;
   variant_t timeBase;
 
   QDateTime start_time_;
   bool isConnected;
-  bool isAcquiring;
 
+  void LoadDefaultConfigs();
 };
 
 #endif  // LYNXDAQ_H

@@ -35,7 +35,6 @@ void ActivityCounter::addData(int numE, double* e, qint64* t){
         }
         else{i++;}
     }
-    std::cout<<"currtime:"<<currtime<<"..."<<t[1]<<"hello"<<t[2]<<std::endl;
 }
 
 

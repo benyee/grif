@@ -6,30 +6,31 @@
 const int DAQControlWidget::kDAQStatusUnknown     = 0;
 const int DAQControlWidget::kDAQStatusConnected   = 1;
 const int DAQControlWidget::kDAQStatusStarted     = 2;
-const int DAQControlWidget::kDAQStatusStopped     = 3;
-const int DAQControlWidget::kDAQStatusError       = 4;
 
-const int DAQControlWidget::kHVStatusUnknown      = 10;
-const int DAQControlWidget::kHVStatusON           = 11;
-const int DAQControlWidget::kHVStatusOFF          = 12;
-const int DAQControlWidget::kHVStatusRampingUp    = 13;
-const int DAQControlWidget::kHVStatusRampingDown  = 14;
+const int DAQControlWidget::kHVStatusUnknown      = 3;
+const int DAQControlWidget::kHVStatusON           = 1;
+const int DAQControlWidget::kHVStatusOFF          = 0;
+const int DAQControlWidget::kHVStatusRamping      = 2;
 
-DAQControlWidget::DAQControlWidget(QWidget *parent, LynxDAQ *daq) :
+DAQControlWidget::DAQControlWidget(QWidget *parent, LynxDAQ *daq, GRIRegulator *r) :
   QWidget(parent),
   ui_(new Ui::DAQControlWidget) {
   ui_->setupUi(this);
 
-  daq_status_ = kDAQStatusUnknown;
-  hv_status_ = kHVStatusUnknown;
-  hv_volts_ = 0.0;
-  hv_volts_max_ = -1.0;
+  daq_thread_ = daq;
+  reg = r;
 
-  // for now, say DAQ and HV are known
-  daq_status_ = kDAQStatusConnected;
-  hv_status_ = kHVStatusOFF;
-  hv_volts_ = 0.0;
-  set_hv_volts_max(-2500.0);
+  if(daq->IsConnected()){
+    daq_status_ = 1;
+    if(daq->IsAcquiring()){ daq_status_=2;}
+  }
+  else{ daq_status_ = 0; hv_status_ = 3;}
+
+  set_hv_volts_max(-5000);
+  if(daq_status_ != 0){
+      hv_status_ = daq_thread_->IsHVOn();
+      hv_volts_ = daq_thread_->HV();
+  }
 
   // set up a timer to update widget
   update_timer_ = new QTimer();
@@ -43,10 +44,15 @@ DAQControlWidget::DAQControlWidget(QWidget *parent, LynxDAQ *daq) :
 
   //start the signal and slot pairs...
   connect(update_timer_, SIGNAL(timeout()), this, SLOT(Update()));
-//  connect(ui_->daqbutton, SIGNAL(clicked()), this, SLOT(StartStopDAQ()));
-  connect(ui_->hvonoffbutton, SIGNAL(clicked()), this, SLOT(SetHVOnOff()));
+
+  connect(ui_->hvon, SIGNAL(clicked()), this, SLOT(SetHVOn()));
+  connect(ui_->hvoff, SIGNAL(clicked()), this, SLOT(SetHVOff()));
+
   connect(ui_->hvenablebutton, SIGNAL(clicked()), this, SLOT(EnableHVControl()));
   connect(hv_enable_timer_, SIGNAL(timeout()), this, SLOT(DisableHVControl()));
+
+  connect(ui_->daqconnect,SIGNAL(clicked()),this,SLOT(Connect()));
+  connect(ui_->daqstartstop,SIGNAL(clicked()),this,SLOT(StartStopAcq()));
 }
 
 
@@ -68,46 +74,47 @@ void DAQControlWidget::set_hv_volts_max(double hv_max) {
 void DAQControlWidget::Update() {
   QPalette palette;
 
+  if(daq_thread_->IsConnected()){
+    daq_status_ = 1;
+    if(daq_thread_->IsAcquiring()){
+        daq_status_=2;
+    }
+  }
+  else{ daq_status_ = 0; }
+
   // DAQ status
   switch (daq_status_) {
     case kDAQStatusUnknown:
       ui_->daqstatus->setText(QString("Status: Unknown"));
       palette = ui_->daqbox->palette();
-      palette.setColor(ui_->daqbox->backgroundRole(), Qt::lightGray);
-      ui_->daqbox->setPalette(palette);
-      ui_->hvenablebutton->setEnabled(false);
-      break;
-    case kDAQStatusConnected:
-      ui_->daqstatus->setText(QString("Status: DAQ Connected"));
-      palette = ui_->daqbox->palette();
-      palette.setColor(ui_->daqbox->backgroundRole(), Qt::green);
-      ui_->daqbox->setPalette(palette);
-      ui_->hvenablebutton->setEnabled(true);
-      break;
-    case kDAQStatusStarted:
-      ui_->daqstatus->setText(QString("Status: DAQ Started"));
-      palette = ui_->daqbox->palette();
-      palette.setColor(ui_->daqbox->backgroundRole(), Qt::green);
-      ui_->daqbox->setPalette(palette);
-      ui_->hvenablebutton->setEnabled(true);
-      break;
-    case kDAQStatusStopped:
-      ui_->daqstatus->setText(QString("Status: DAQ Stopped"));
-      palette = ui_->daqbox->palette();
-      palette.setColor(ui_->daqbox->backgroundRole(), Qt::green);
-      ui_->daqbox->setPalette(palette);
-      ui_->hvenablebutton->setEnabled(true);
-      break;
-    case kDAQStatusError:
-      ui_->daqstatus->setText(QString("Status: DAQ Error"));
-      palette = ui_->daqbox->palette();
       palette.setColor(ui_->daqbox->backgroundRole(), Qt::red);
       ui_->daqbox->setPalette(palette);
       ui_->hvenablebutton->setEnabled(false);
       break;
+    case kDAQStatusConnected:
+      ui_->daqstatus->setText(QString("Status: DAQ Connected, not acquiring"));
+      palette = ui_->daqbox->palette();
+      palette.setColor(ui_->daqbox->backgroundRole(), Qt::yellow);
+      ui_->daqbox->setPalette(palette);
+      ui_->hvenablebutton->setEnabled(true);
+      break;
+    case kDAQStatusStarted:
+      ui_->daqstatus->setText(QString("Status: DAQ acquiring"));
+      palette = ui_->daqbox->palette();
+      palette.setColor(ui_->daqbox->backgroundRole(), Qt::green);
+      ui_->daqbox->setPalette(palette);
+      ui_->hvenablebutton->setEnabled(true);
+      break;
     default:
       break;
   }
+
+  // HV status
+  if(daq_status_){
+      hv_status_ = daq_thread_->IsHVOn();
+      hv_volts_ = daq_thread_->HV();
+  }
+  else{ hv_status_ = 3;}
 
   // HV status
   switch (hv_status_) {
@@ -123,16 +130,11 @@ void DAQControlWidget::Update() {
       palette.setColor(ui_->hvbox->backgroundRole(), Qt::red);
       ui_->hvbox->setPalette(palette);
       break;
-    case kHVStatusRampingUp:
-      ui_->hvstatus->setText(QString("Status: HV Ramping Up"));
+    case kHVStatusRamping:
+      ui_->hvstatus->setText(QString("Status: HV Ramping"));
       palette = ui_->hvbox->palette();
       palette.setColor(ui_->hvbox->backgroundRole(), Qt::yellow);
       ui_->hvbox->setPalette(palette);
-      hv_volts_ -= 20.;
-      if (hv_volts_ <= hv_volts_max_) {
-        hv_volts_ = hv_volts_max_;
-        hv_status_ = kHVStatusON;
-      }
       break;
     case kHVStatusON:
       ui_->hvstatus->setText(QString("Status: HV ON"));
@@ -140,20 +142,10 @@ void DAQControlWidget::Update() {
       palette.setColor(ui_->hvbox->backgroundRole(), Qt::green);
       ui_->hvbox->setPalette(palette);
       break;
-    case kHVStatusRampingDown:
-      ui_->hvstatus->setText(QString("Status: HV Ramping Down"));
-      palette = ui_->hvbox->palette();
-      palette.setColor(ui_->hvbox->backgroundRole(), Qt::yellow);
-      ui_->hvbox->setPalette(palette);
-      hv_volts_ += 40.;
-      if (hv_volts_ >= 0.) {
-        hv_volts_ = 0.;
-        hv_status_ = kHVStatusOFF;
-      }
-      break;
     default:
       break;
   }
+
   if (hv_status_ == kHVStatusUnknown) {
     ui_->hvvoltage->setText(QString("Voltage: Unknown"));
   } else {
@@ -186,29 +178,24 @@ void DAQControlWidget::EnableHVControl() {
     if (!hv_enabled_) {
       hv_enabled_ = true;
       hv_enable_timer_->start();
-      ui_->hvonoffbutton->setEnabled(true);
+      ui_->hvon->setEnabled(true);
+      ui_->hvoff->setEnabled(true);
     } else if (hv_enabled_) {
       DisableHVControl();
     }
   }
 }
 
-
 void DAQControlWidget::DisableHVControl() {
   if (daq_status_ != kHVStatusUnknown) {
     hv_enabled_ = false;
     hv_enable_timer_->stop();
-    ui_->hvonoffbutton->setEnabled(false);
+    ui_->hvon->setEnabled(false);
+    ui_->hvoff->setEnabled(false);
   }
 }
 
-
-void DAQControlWidget::SetHVOnOff() {
-  if (hv_enabled_ && hv_status_ == kHVStatusON) {
-    ui_->hvstatus->setText(QString("Status: HV Ramping Down"));
-    hv_status_ = kHVStatusRampingDown;
-  } else if (hv_enabled_ && hv_status_ == kHVStatusOFF) {
-    ui_->hvstatus->setText(QString("Status: HV Ramping Up"));
-    hv_status_ = kHVStatusRampingUp;
-  }
+void DAQControlWidget::StartStopAcq(){
+    if (daq_status_ == 2){reg->Stop(); GRISleep::msleep(5000); }
+    else {reg->Start();}
 }

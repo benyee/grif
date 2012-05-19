@@ -15,8 +15,6 @@ DEPENDPATH += ../../ . \
         ../../framework/source/hist \
         ../../framework/include/hist \
 
-#DEPENDPATH += C:/Canberra/SDK/CPPExamples/Examples/Include
-
 
 INCLUDEPATH += ../../ . \
         ./include \
@@ -36,12 +34,14 @@ SOURCES += \
     src/main.cpp \
     src/LynxDAQ.cpp \
     src/SIMAnalysisThread.cpp \
-    src/ActivityCounter.cpp
+    src/ActivityCounter.cpp \
+    src/DAQControlWidget.cpp
 
 HEADERS += \
     include/LynxDAQ.h \
     include/SIMAnalysisThread.h \
-    include/ActivityCounter.h
+    include/ActivityCounter.h \
+    include/DAQControlWidget.h
 
 ##
 # Please fill in GRIFDIR and ROOTDIR with the appropriate paths
@@ -108,5 +108,8 @@ INCLUDEPATH+="C:/Canberra/SDK/CPPExamples/Examples/ExampleList"
 #Need the following for some of the functions used in Utilities.h:
 LIBS+="C:/Program Files/Microsoft SDKs/Windows/v7.0A/Lib/WS2_32.lib"
 LIBS+="C:/Program Files/Microsoft SDKs/Windows/v7.0A/Lib/IPHlpApi.lib"
+
+FORMS += \
+    src/DAQControlWidget.ui
 
 

@@ -1,0 +1,120 @@
+15:37:18.649: ADCOutput(1) accumulator writing 166 events. Timestamp = 1.11815
+
+15:37:18.649: CHAN(1) accumulator writing 166 events. Timestamp = 1.11815
+
+15:37:18.650: TS(1) accumulator writing 166 events. Timestamp = 1.11815
+
+15:37:18.656: ADCOutput(1) accumulator writing 216 events. Timestamp = 1.11884
+
+15:37:18.657: CHAN(1) accumulator writing 216 events. Timestamp = 1.11884
+
+15:37:18.657: TS(1) accumulator writing 216 events. Timestamp = 1.11884
+
+15:37:19.015: ADCOutput(2) accumulator writing 392 events. Timestamp = 1.72144
+
+15:37:19.015: ADCOutput(2) accumulator writing 472 events. Timestamp = 1.6608
+
+15:37:19.015: ADCOutput(3) accumulator writing 998 events. Timestamp = 1.72144
+
+15:37:19.015: ADCOutput(3) accumulator writing 1260 events. Timestamp = 1.6608
+
+15:37:19.015: CHAN(2) accumulator writing 392 events. Timestamp = 1.72144
+
+15:37:19.015: CHAN(3) accumulator writing 998 events. Timestamp = 1.72144
+
+15:37:19.015: CHAN(2) accumulator writing 472 events. Timestamp = 1.6608
+
+15:37:19.015: TS(2) accumulator writing 392 events. Timestamp = 1.72144
+
+15:37:19.015: CHAN(3) accumulator writing 1260 events. Timestamp = 1.6608
+
+15:37:19.015: TS(3) accumulator writing 998 events. Timestamp = 1.72144
+
+15:37:19.015: TS(2) accumulator writing 472 events. Timestamp = 1.6608
+
+15:37:19.015: TS(3) accumulator writing 1260 events. Timestamp = 1.6608
+
+15:37:19.365: ADCOutput(4) accumulator writing 1016 events. Timestamp = 1.93844
+
+15:37:19.366: CHAN(4) accumulator writing 1016 events. Timestamp = 1.93844
+
+15:37:19.367: TS(4) accumulator writing 1016 events. Timestamp = 1.93844
+
+15:37:19.381: ADCOutput(4) accumulator writing 1211 events. Timestamp = 2.07128
+
+15:37:19.383: CHAN(4) accumulator writing 1211 events. Timestamp = 2.07128
+
+15:37:19.384: TS(4) accumulator writing 1211 events. Timestamp = 2.07128
+
+15:37:19.718: ADCOutput(5) accumulator writing 1007 events. Timestamp = 2.18713
+
+15:37:19.719: ADCOutput(1) accumulator writing 923 events. Timestamp = 2.18713
+
+15:37:19.720: CHAN(5) accumulator writing 1007 events. Timestamp = 2.18713
+
+15:37:19.721: CHAN(1) accumulator writing 923 events. Timestamp = 2.18713
+
+15:37:19.721: TS(5) accumulator writing 1007 events. Timestamp = 2.18713
+
+15:37:19.722: TS(1) accumulator writing 923 events. Timestamp = 2.18713
+
+15:37:19.736: ADCOutput(5) accumulator writing 1230 events. Timestamp = 2.45129
+
+15:37:19.737: ADCOutput(1) accumulator writing 1246 events. Timestamp = 2.45129
+
+15:37:19.738: CHAN(5) accumulator writing 1230 events. Timestamp = 2.45129
+
+15:37:19.739: CHAN(1) accumulator writing 1246 events. Timestamp = 2.45129
+
+15:37:19.740: TS(5) accumulator writing 1230 events. Timestamp = 2.45129
+
+15:37:19.741: TS(1) accumulator writing 1246 events. Timestamp = 2.45129
+
+15:37:20.073: ADCOutput(2) accumulator writing 1039 events. Timestamp = 2.7246
+
+15:37:20.074: CHAN(2) accumulator writing 1039 events. Timestamp = 2.7246
+
+15:37:20.074: TS(2) accumulator writing 1039 events. Timestamp = 2.7246
+
+15:37:20.093: ADCOutput(2) accumulator writing 1280 events. Timestamp = 2.83013
+
+15:37:20.095: CHAN(2) accumulator writing 1280 events. Timestamp = 2.83013
+
+15:37:20.096: TS(2) accumulator writing 1280 events. Timestamp = 2.83013
+
+15:37:20.424: ADCOutput(3) accumulator writing 1073 events. Timestamp = 3.15252
+
+15:37:20.425: CHAN(3) accumulator writing 1073 events. Timestamp = 3.15252
+
+15:37:20.426: TS(3) accumulator writing 1073 events. Timestamp = 3.15252
+
+15:37:20.448: ADCOutput(3) accumulator writing 1152 events. Timestamp = 3.22923
+
+15:37:20.449: CHAN(3) accumulator writing 1152 events. Timestamp = 3.22923
+
+15:37:20.449: TS(3) accumulator writing 1152 events. Timestamp = 3.22923
+
+15:37:20.776: ADCOutput(4) accumulator writing 981 events. Timestamp = 3.55459
+
+15:37:20.778: ADCOutput(5) accumulator writing 961 events. Timestamp = 3.55459
+
+15:37:20.779: CHAN(4) accumulator writing 981 events. Timestamp = 3.55459
+
+15:37:20.780: CHAN(5) accumulator writing 961 events. Timestamp = 3.55459
+
+15:37:20.781: TS(4) accumulator writing 981 events. Timestamp = 3.55459
+
+15:37:20.783: TS(5) accumulator writing 961 events. Timestamp = 3.55459
+
+15:37:20.800: ADCOutput(4) accumulator writing 1292 events. Timestamp = 3.39582
+
+15:37:20.802: ADCOutput(5) accumulator writing 1261 events. Timestamp = 3.39582
+
+15:37:20.803: CHAN(4) accumulator writing 1292 events. Timestamp = 3.39582
+
+15:37:20.804: CHAN(5) accumulator writing 1261 events. Timestamp = 3.39582
+
+15:37:20.804: TS(4) accumulator writing 1292 events. Timestamp = 3.39582
+
+15:37:20.806: TS(5) accumulator writing 1261 events. Timestamp = 3.39582
+

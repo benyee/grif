@@ -1,13 +1,15 @@
 #include "LynxDAQ.h"
 
 
-LynxDAQ::LynxDAQ(int num, double min, double max, double rate) {
+LynxDAQ::LynxDAQ() {
     lynx = Utilities::Device();
     input = 1;
     VariantInit (&Args);
 
-    isAcquiring = false;
     isConnected = false;
+
+    currLiveTime = 0;
+    currRealTime = 0;
 }
 
 LynxDAQ::~LynxDAQ() {
@@ -26,34 +28,39 @@ GRIDAQBaseAccumNode* LynxDAQ::RegisterDataOutput(QString outName) {
 }
 
 int LynxDAQ::ConnectToDAQ(){
+    if(isConnected){return 0;}
     try{
         //Open a connection to the device
         bstr_t lynxAddress;
-        if (LYNX_DEFAULT){
-        lynxAddress = LYNX_IPADDRESS;
-        }
+        if (LYNX_DEFAULT){lynxAddress = LYNX_IPADDRESS;}
         else{lynxAddress = Utilities::getLynxAddress ();}
         lynx->Open(Utilities::getLocalAddress (lynxAddress), lynxAddress);
 
         //Display the name of the lynx
         cout << "You are connected to: " << Utilities::GetString ((bstr_t)(lynx->GetParameter (DevCntl::Network_MachineName, (short) 0))) << "\n";
-
-        //Gain ownership
-        lynx->LockInput (_bstr_t("administrator"), _bstr_t("password"), input);
-        cout<<"Gained ownership."<<endl;
         isConnected = true;
-        Utilities::disableAcquisition(lynx, input);
-        cout<<"Disabled acquisition."<<endl;
+
+
+        //Update current times:
+        currLiveTime = LiveTime();
+        currRealTime = RealTime();
     }catch(int e){
     }
     return 0;
 }
 
 int LynxDAQ::LoadConfiguration(){
+    //Gain ownership
+    lynx->LockInput (_bstr_t("administrator"), _bstr_t("password"), input);
+    cout<<"Gained ownership."<<endl;
+
     if(LYNX_DEFAULT){
         LoadDefaultConfigs();
         return 0;
     }
+
+    Utilities::disableAcquisition(lynx, input);
+    cout<<"Disabled acquisition."<<endl;
 
     //Set the acq mode
     // see page 32 of pdf for documentation on different list modes
@@ -94,6 +101,13 @@ int LynxDAQ::Initialize(){
 
     TurnOnHV();
 
+    //Wait till ramped
+    while(VARIANT_TRUE == (VARIANT_BOOL)(variant_t)(lynx->GetParameter (DevCntl::Input_VoltageRamping, input)))
+    {
+        cout << "HVPS is ramping... voltage is at "<<HV()<<endl;
+        Sleep (500);
+    }
+
     //Set the current memory group
     variant_t group = 1L;
     lynx->PutParameter (DevCntl::Input_CurrentGroup, input, &group);
@@ -109,13 +123,10 @@ int LynxDAQ::StartDataAcquisition() {
   lynx->Control (DevCntl::Clear, input, &Args);
   lynx->Control (DevCntl::Start, input, &Args);
 
-  isAcquiring = true;
-
   return 0;
 }
 
 int LynxDAQ::AcquireData(int n) {
-
     //Get the list data
     variant_t listB = lynx->GetListData (input);
 
@@ -156,13 +167,15 @@ int LynxDAQ::AcquireData(int n) {
         ADC.push_back((double)recEvent);
         ts.push_back((qint64)(Time*cnv));
         Time=0;
-        cout << "Event: " << ADC.back()<< "; Time (uS): " << ts.back()<< " (LynxDAQ)"<<endl;
+        //cout << "Event: " << ADC.back()<< "; Time (uS): " << ts.back()<< " (LynxDAQ)"<<endl;
     }
 
     PostData<double>(ADC.size(), "ADCOutput",&ADC[0],&ts[0]);
     PostData<qint64>(ADC.size(), "TS",&ts[0],&ts[0]);
-    cout<<"Just posted"<<endl;
+    //cout<<"Just posted"<<endl;
 
+    currRealTime = RealTime();
+    currLiveTime = LiveTime();
     return 0;
 }
 
@@ -171,11 +184,14 @@ int LynxDAQ::StopDataAcquisition(){
     Utilities::disableAcquisition(lynx, input);
     cout<<"Disabled Acquisition"<<endl;
 
-    isAcquiring = false;
+    lynx->Control (DevCntl::Clear, input, &Args);
     return 0;
 }
 
 void LynxDAQ::LoadDefaultConfigs(){
+
+    Utilities::disableAcquisition(lynx, input);
+    cout<<"Disabled acquisition."<<endl;
 
     //Set the acq mode
     // see page 32 of pdf for documentation on different list modes
@@ -204,13 +220,6 @@ void LynxDAQ::TurnOnHV(long v){
     //Set HV to v
     variant_t voltage = v;
     lynx->PutParameter(DevCntl::Input_Voltage, input, &voltage);
-
-    //Wait till ramped
-    while(VARIANT_TRUE == (VARIANT_BOOL)(variant_t)(lynx->GetParameter (DevCntl::Input_VoltageRamping, input)))
-    {
-        cout << "HVPS is ramping... voltage is at "<<HV()<<endl;
-        Sleep (500);
-    }
 }
 void LynxDAQ::TurnOffHV(){
     //Turn off HV
@@ -218,10 +227,10 @@ void LynxDAQ::TurnOffHV(){
     lynx->PutParameter (DevCntl::Input_VoltageStatus, input, &voltageStatus);
 }
 int LynxDAQ::IsHVOn(){
-    if(VARIANT_TRUE == (VARIANT_BOOL)(variant_t)(lynx ->GetParameter(DevCntl::Input_VoltageStatus,input))){
-        if(VARIANT_TRUE == (VARIANT_BOOL)(variant_t)(lynx->GetParameter (DevCntl::Input_VoltageRamping, input))){
-            return 2;
-        }
+    if(VARIANT_TRUE == (VARIANT_BOOL)(variant_t)(lynx->GetParameter (DevCntl::Input_VoltageRamping, input))){
+        return 2;
+    }
+    else if(VARIANT_TRUE == (VARIANT_BOOL)(variant_t)(lynx ->GetParameter(DevCntl::Input_VoltageStatus,input))){
         return 1;
     }
     return 0;

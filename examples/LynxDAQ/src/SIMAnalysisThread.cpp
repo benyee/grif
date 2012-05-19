@@ -41,28 +41,18 @@ int SIMAnalysisThread::Analyze() {
     QPair<int, qint64*> pTS = ReadData<qint64>("LynxDAQ","TS");
     ts = pTS.second;
 
-    for(int i = 0; i<nADC; i++){
-       std::cout << "Event: " << ADC[i]<< "; Time (uS): " << ts[i]<< std::endl;
-    }
-
-    std::cout<<"Read it with nADC = "<<nADC<<std::endl;
-
-    std::cout<<"\n"<<sizeof ADC<<"..."<<sizeof ts<<" are the sizes"<<std::endl;
-
-
     RatePlotter->addData(nADC,ADC,ts);
 
     QPair<std::vector<double>,std::vector<qint64> > activity = RatePlotter->getPlotData();
     std::vector<double> e = activity.first;
     std::vector<qint64> t = activity.second;
-    std::cout<<"\n"<<e.size()<<"..."<<t.size()<<" are the sizes"<<std::endl;
     std::vector<double>::iterator itr_e = e.begin();
     std::vector<qint64>::iterator itr_t = t.begin();
+
     for(itr_e = e.begin(); itr_e < e.end(); itr_e++){
         std::cout<<"The rate at time "<<*itr_t<<" is "<<*itr_e<<std::endl;
         itr_t++;
     }
-
     std::cout<<"Analyzed"<<std::endl;
 
     return 0;
