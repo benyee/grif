@@ -1,7 +1,8 @@
 #include "LynxDAQ.h"
 
-
 LynxDAQ::LynxDAQ() {
+    ref_time_ = QDateTime(QDate(2012,5,1));  //May 1st, 2012 12:00am
+
     lynx = Utilities::Device();
     input = 1;
     VariantInit (&Args);
@@ -127,6 +128,7 @@ int LynxDAQ::Initialize(){
 int LynxDAQ::StartDataAcquisition() {
     cout<<"Starting Data Acquisition"<<endl;
   start_time_ = QDateTime::currentDateTime();
+  dt = ref_time_.msecsTo(start_time_);
   InitializeAccumulators(start_time_,0);
 
   //Clear the memory and start the acquisition
@@ -181,9 +183,8 @@ int LynxDAQ::AcquireData(int n) {
 
         ADC.push_back((double)recEvent);
         ts.push_back((qint64)(Time*cnv));
-        ts_sec.push_back((double)(Time*cnv)/1e6);
+        ts_sec.push_back((double)(Time*cnv)/1e6+(double)dt/1000);
         Time=0;
-        //cout << "Event: " << ADC.back()<< "; Time (uS): " << ts.back()<< " (LynxDAQ)"<<endl;
     }
 
     PostData<double>(ADC.size(), "ADCOutput",&ADC[0],&ts[0]);

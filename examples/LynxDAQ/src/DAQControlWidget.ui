@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>411</width>
+    <width>409</width>
     <height>390</height>
    </rect>
   </property>
@@ -110,8 +110,41 @@
       <bool>true</bool>
      </property>
      <property name="title">
-      <string>GroupBox</string>
+      <string>Timestamps:</string>
      </property>
+     <widget class="QDateTimeEdit" name="refTime">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>161</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="dateTime">
+       <datetime>
+        <hour>0</hour>
+        <minute>0</minute>
+        <second>0</second>
+        <year>2012</year>
+        <month>5</month>
+        <day>1</day>
+       </datetime>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>171</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Reference Time:</string>
+      </property>
+     </widget>
     </widget>
    </item>
    <item row="1" column="1">

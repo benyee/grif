@@ -21,6 +21,7 @@
 // dhchivers@lbl.gov
 
 #include <QPair>
+#include <iomanip>
 #include <iostream>
 #include <fstream>
 #include "SIMAnalysisThread.h"
@@ -57,7 +58,7 @@ int SIMAnalysisThread::Analyze() {
         }
         std::fstream outfile(filename,std::ios::app);
         for(int i = 0; i < nADC; i++){
-            outfile << ADC[i]<<'\t'<<ts_sec[i]<<'\n';
+            outfile<< ADC[i]<<'\t'<<std::setprecision(25)<<ts_sec[i]<<'\n';
             storedEvents.first.push_back(ADC[i]);
             storedEvents.second.push_back(ts_sec[i]);
         }

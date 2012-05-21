@@ -36,6 +36,9 @@ class LynxDAQ : public GRIDAQThread {
   double LiveTime(){return (double)lynx->GetParameter(DevCntl::Elapsed_Live, input);}
   double RealTime(){return (double)lynx->GetParameter(DevCntl::Elapsed_Real, input);}
 
+  //Change/get reference time:
+  void setRefTime(QDateTime q){ref_time_ = q;}
+  QDateTime getRefTime(){return ref_time_;}
 
  private:
   long input;
@@ -46,7 +49,8 @@ class LynxDAQ : public GRIDAQThread {
   variant_t timeBase;
 
   QDateTime start_time_;
-  qint64 dt; // milliseconds between start_time_ and May 1st, 2012, 12:00:00 am.
+  QDateTime ref_time_; //Reference time for timestamps.
+  qint64 dt; // milliseconds between start_time_ and REF_TIME
   bool isConnected;
 
   void LoadDefaultConfigs();

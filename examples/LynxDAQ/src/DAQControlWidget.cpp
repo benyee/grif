@@ -84,6 +84,8 @@ void DAQControlWidget::Update() {
   }
 
   ui_ ->outFileName->setEnabled(true);
+  ui_ ->refTime->setEnabled(true);
+
   // DAQ status
   switch (daq_status_) {
     case kDAQStatusUnknown:
@@ -105,8 +107,10 @@ void DAQControlWidget::Update() {
       palette = ui_->daqbox->palette();
       palette.setColor(ui_->daqbox->backgroundRole(), Qt::green);
       ui_->daqbox->setPalette(palette);
+
       ui_->hvenablebutton->setEnabled(true);
       ui_->outFileName->setEnabled(false);
+      ui_ ->refTime->setEnabled(false);
       break;
     default:
       break;
@@ -206,6 +210,8 @@ void DAQControlWidget::StartStopAcq(){
         //Send file name and prevent further file name changes:
         an_thread_->setFileName(ui_->outFileName->toPlainText().toStdString()+".txt");
         ui_->outFileName->setEnabled(false);
+        daq_thread_->setRefTime(ui_->refTime->dateTime());
+        ui_ ->refTime->setEnabled(false);
 
         ui_->startTime->setText(QDateTime::currentDateTime().toString("dd.MMM.yyyy hh:mm:ss.zzz"));
 
@@ -219,6 +225,8 @@ void DAQControlWidget::StartStopAcq(){
         //Send file name and prevent further file name changes:
         an_thread_->setFileName(ui_->outFileName->toPlainText().toStdString()+".txt");
         ui_->outFileName->setEnabled(false);
+        daq_thread_->setRefTime(ui_->refTime->dateTime());
+        ui_ ->refTime->setEnabled(false);
 
         daq_thread_->StartCollection();
     }
