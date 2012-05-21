@@ -59,7 +59,7 @@
 ///     /// Talk to hardware
 ///   }
 /// 
-///   int Initalize() {
+///   int Initialize() {
 ///     /// Initialize DAQ hardware
 ///   }
 /// 

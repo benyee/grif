@@ -5,7 +5,6 @@ LynxDAQ::LynxDAQ() {
     lynx = Utilities::Device();
     input = 1;
     VariantInit (&Args);
-
     isConnected = false;
 
     currLiveTime = 0;
@@ -13,33 +12,42 @@ LynxDAQ::LynxDAQ() {
 }
 
 LynxDAQ::~LynxDAQ() {
-    delete(lynx);
 }
 
 
 GRIDAQBaseAccumNode* LynxDAQ::RegisterDataOutput(QString outName) {
   GRIDAQBaseAccumNode* p = NULL;
   if (outName == "ADCOutput") {
-    p = new GRIDAQAccumulator<double>(outName,1e8,5,250);
+    p = new GRIDAQAccumulator<double>(outName,1e6,5,250);
   } else if (outName == "TS") {
-    p = new GRIDAQAccumulator<qint64>(outName,1e8,5,250);
+    p = new GRIDAQAccumulator<double>(outName,1e6,5,250);
   }
   return p;
 }
 
 int LynxDAQ::ConnectToDAQ(){
-    if(isConnected){return 0;}
     try{
         //Open a connection to the device
+        if(isConnected){
+            //Release ownership
+            lynx->UnlockInput (_bstr_t("administrator"), _bstr_t("password"), input);
+            cout<<"Released ownership."<<endl;
+
+            lynx = Utilities::Device();
+            isConnected=false;
+            cout<<"No Problems here."<<endl;
+        }
         bstr_t lynxAddress;
         if (LYNX_DEFAULT){lynxAddress = LYNX_IPADDRESS;}
         else{lynxAddress = Utilities::getLynxAddress ();}
         lynx->Open(Utilities::getLocalAddress (lynxAddress), lynxAddress);
-
         //Display the name of the lynx
         cout << "You are connected to: " << Utilities::GetString ((bstr_t)(lynx->GetParameter (DevCntl::Network_MachineName, (short) 0))) << "\n";
         isConnected = true;
 
+        //Gain ownership
+        lynx->LockInput (_bstr_t("administrator"), _bstr_t("password"), input);
+        cout<<"Gained ownership."<<endl;
 
         //Update current times:
         currLiveTime = LiveTime();
@@ -50,10 +58,9 @@ int LynxDAQ::ConnectToDAQ(){
 }
 
 int LynxDAQ::LoadConfiguration(){
-    //Gain ownership
-    lynx->LockInput (_bstr_t("administrator"), _bstr_t("password"), input);
-    cout<<"Gained ownership."<<endl;
+    cout<<"Lodaing Configuration"<<endl;
 
+    cout<<lynx<<endl;
     if(LYNX_DEFAULT){
         LoadDefaultConfigs();
         return 0;
@@ -96,6 +103,8 @@ int LynxDAQ::LoadConfiguration(){
 }
 
 int LynxDAQ::Initialize(){
+    cout<<"Initializing..."<<endl;
+
     //Clear data and time
     lynx->Control (DevCntl::Clear, input, &Args);
 
@@ -116,17 +125,22 @@ int LynxDAQ::Initialize(){
 }
 
 int LynxDAQ::StartDataAcquisition() {
+    cout<<"Starting Data Acquisition"<<endl;
   start_time_ = QDateTime::currentDateTime();
   InitializeAccumulators(start_time_,0);
 
   //Clear the memory and start the acquisition
+  cout<<"About to clear memory"<<endl;
   lynx->Control (DevCntl::Clear, input, &Args);
+  cout<<"Cleared memory"<<endl;
   lynx->Control (DevCntl::Start, input, &Args);
+  cout<<"Started Acq."<<endl;
 
   return 0;
 }
 
 int LynxDAQ::AcquireData(int n) {
+    cout<<"Acquiring Data..."<<endl;
     //Get the list data
     variant_t listB = lynx->GetListData (input);
 
@@ -143,6 +157,7 @@ int LynxDAQ::AcquireData(int n) {
     LONG i=0;
 
     vector<double> ADC;
+    vector<double> ts_sec;
     vector<qint64> ts;
 
 
@@ -166,12 +181,13 @@ int LynxDAQ::AcquireData(int n) {
 
         ADC.push_back((double)recEvent);
         ts.push_back((qint64)(Time*cnv));
+        ts_sec.push_back((double)(Time*cnv)/1e6);
         Time=0;
         //cout << "Event: " << ADC.back()<< "; Time (uS): " << ts.back()<< " (LynxDAQ)"<<endl;
     }
 
     PostData<double>(ADC.size(), "ADCOutput",&ADC[0],&ts[0]);
-    PostData<qint64>(ADC.size(), "TS",&ts[0],&ts[0]);
+    PostData<double>(ADC.size(), "TS",&ts_sec[0],&ts[0]);
     //cout<<"Just posted"<<endl;
 
     currRealTime = RealTime();
@@ -184,7 +200,9 @@ int LynxDAQ::StopDataAcquisition(){
     Utilities::disableAcquisition(lynx, input);
     cout<<"Disabled Acquisition"<<endl;
 
-    lynx->Control (DevCntl::Clear, input, &Args);
+    currRealTime = RealTime();
+    currLiveTime = LiveTime();
+
     return 0;
 }
 

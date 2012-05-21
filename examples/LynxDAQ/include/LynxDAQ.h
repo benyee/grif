@@ -27,8 +27,8 @@ class LynxDAQ : public GRIDAQThread {
   void TurnOnHV(long V);
   void TurnOnHV(){TurnOnHV((long)5000);}
   void TurnOffHV();
-  int IsHVOn(); //Returns 0 if off, 1 if on, 2 if ramping
-  double HV(); //Returns current value of the voltage
+  int IsHVOn(); // Returns 0 if off, 1 if on, 2 if ramping
+  double HV(); // Returns current value of the voltage
 
   bool IsConnected(){return isConnected;}
   bool IsAcquiring(){return (LiveTime()-currLiveTime>0.01);}
@@ -46,6 +46,7 @@ class LynxDAQ : public GRIDAQThread {
   variant_t timeBase;
 
   QDateTime start_time_;
+  qint64 dt; // milliseconds between start_time_ and May 1st, 2012, 12:00:00 am.
   bool isConnected;
 
   void LoadDefaultConfigs();

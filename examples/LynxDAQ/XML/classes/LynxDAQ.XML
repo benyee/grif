@@ -7,7 +7,6 @@
   </RunTimeParams>
   <DataBlocks> 
     <Data block = "ADCOutput" /> 
-    <Data block = "CHAN" /> 
     <Data block = "TS" />
   </DataBlocks> 
 </class>

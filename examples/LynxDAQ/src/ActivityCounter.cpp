@@ -20,9 +20,7 @@ void ActivityCounter::addData(int numE, double* e, qint64* t){
     while(i<numE){
         if(t[i]< currtime+dt){
             //Count # of hits within our ROI in the current time interval:
-            if(e[i] > leftROI && e[i]<rightROI ){
-                count++;
-            }
+            if(e[i] > leftROI && e[i]<rightROI ){count++;}
             i++;
         }
         else if(t[i] > currtime){

@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
     p->push_back(lynx);
     p->push_back(AMC1);
 
-    DAQControlWidget* gui = new DAQControlWidget(0,lynx,reg);
+    DAQControlWidget* gui = new DAQControlWidget(0,lynx,AMC1,reg);
     gui->show();
 
     /*

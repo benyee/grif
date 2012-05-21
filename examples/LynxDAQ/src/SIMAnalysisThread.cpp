@@ -21,10 +21,13 @@
 // dhchivers@lbl.gov
 
 #include <QPair>
+#include <iostream>
+#include <fstream>
 #include "SIMAnalysisThread.h"
 
-SIMAnalysisThread::SIMAnalysisThread() {
-    RatePlotter = new ActivityCounter(0,8000,500000);
+SIMAnalysisThread::SIMAnalysisThread(double x, std::string s) {
+    dataLength = x;
+    filename = s;
 }
 
 SIMAnalysisThread::~SIMAnalysisThread() {
@@ -32,26 +35,33 @@ SIMAnalysisThread::~SIMAnalysisThread() {
 
 int SIMAnalysisThread::Analyze() {
     double* ADC;
-    qint64* ts;
+    double* ts_sec; //timestamp in seconds
     int nADC;
 
     QPair<int, double*> pADC = ReadData<double>("LynxDAQ","ADCOutput");
     ADC = pADC.second; nADC = pADC.first;
 
-    QPair<int, qint64*> pTS = ReadData<qint64>("LynxDAQ","TS");
-    ts = pTS.second;
+    QPair<int, double*> pTS = ReadData<double>("LynxDAQ","TS");
+    ts_sec = pTS.second;
 
-    RatePlotter->addData(nADC,ADC,ts);
+    std::vector<double>::iterator itr_oldadc = storedEvents.first.begin();
+    std::vector<double>::iterator itr_oldts = storedEvents.second.begin();
 
-    QPair<std::vector<double>,std::vector<qint64> > activity = RatePlotter->getPlotData();
-    std::vector<double> e = activity.first;
-    std::vector<qint64> t = activity.second;
-    std::vector<double>::iterator itr_e = e.begin();
-    std::vector<qint64>::iterator itr_t = t.begin();
-
-    for(itr_e = e.begin(); itr_e < e.end(); itr_e++){
-        std::cout<<"The rate at time "<<*itr_t<<" is "<<*itr_e<<std::endl;
-        itr_t++;
+    //Erase old data
+    if(nADC> 0){
+        while(itr_oldadc < storedEvents.first.end() && ts_sec[nADC-1] - *itr_oldts > dataLength){
+            storedEvents.first.erase(storedEvents.first.begin());
+            storedEvents.second.erase(storedEvents.second.begin());
+            itr_oldadc++;
+            itr_oldts++;
+        }
+        std::fstream outfile(filename,std::ios::app);
+        for(int i = 0; i < nADC; i++){
+            outfile << ADC[i]<<'\t'<<ts_sec[i]<<'\n';
+            storedEvents.first.push_back(ADC[i]);
+            storedEvents.second.push_back(ts_sec[i]);
+        }
+        outfile.close();
     }
     std::cout<<"Analyzed"<<std::endl;
 
