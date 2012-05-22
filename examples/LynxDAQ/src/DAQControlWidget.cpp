@@ -17,6 +17,7 @@ DAQControlWidget::DAQControlWidget(QWidget *parent, LynxDAQ *daq, SIMAnalysisThr
   ui_(new Ui::DAQControlWidget) {
   ui_->setupUi(this);
 
+  //Retrieve DAQ, analysis thread, and regulator pointers:
   daq_thread_ = daq;
   an_thread_ = sat;
   reg = r;
@@ -34,6 +35,7 @@ DAQControlWidget::DAQControlWidget(QWidget *parent, LynxDAQ *daq, SIMAnalysisThr
   hv_enable_timer_->setInterval(500);
   DisableHVControl();
 
+  //Update the page to make sure everything's good to go:
   Update();
 
   //start the signal and slot pairs...
@@ -54,6 +56,9 @@ DAQControlWidget::~DAQControlWidget() {
   delete ui_;
   delete update_timer_;
   delete hv_enable_timer_;
+  delete daq_thread_;
+  delete an_thread_;
+  delete reg;
 }
 
 
@@ -71,28 +76,38 @@ void DAQControlWidget::Update() {
   //Check connection/acquisition status:
   if(daq_thread_->IsConnected()){
     daq_status_ = kDAQStatusConnected;
-    ui_->daqconnect->setEnabled(false);
-    ui_->daqstartstop->setEnabled(true);
     if(daq_thread_->IsAcquiring()){
         daq_status_=kDAQStatusStarted;
     }
+
+    //Connect button no longer necessary, but Start/Stop is now needed:
+    ui_->daqconnect->setEnabled(false);
+    ui_->daqstartstop->setEnabled(true);
+
   }
   else{
       daq_status_ = kDAQStatusUnknown;
+
+      //User must first connect to Lynx before starting data acquisition:
       ui_->daqconnect->setEnabled(true);
       ui_->daqstartstop->setEnabled(false);
   }
 
+  //Allow the user to change output file name and reference time unless one of the cases below says otherwise.
   ui_ ->outFileName->setEnabled(true);
   ui_ ->refTime->setEnabled(true);
+  //Allow the user to alter HV unless one of the cases below says otherwise
+  ui_->hvenablebutton->setEnabled(true);
 
-  // DAQ status
+  // DAQ status - the first 4 lines in each case update the display of the first box.
   switch (daq_status_) {
     case kDAQStatusUnknown:
       ui_->daqstatus->setText(QString("Status: Unknown"));
       palette = ui_->daqbox->palette();
       palette.setColor(ui_->daqbox->backgroundRole(), Qt::red);
       ui_->daqbox->setPalette(palette);
+
+      //Disable the HV button since you're not connected anyway:
       ui_->hvenablebutton->setEnabled(false);
       break;
     case kDAQStatusConnected:
@@ -100,7 +115,6 @@ void DAQControlWidget::Update() {
       palette = ui_->daqbox->palette();
       palette.setColor(ui_->daqbox->backgroundRole(), Qt::yellow);
       ui_->daqbox->setPalette(palette);
-      ui_->hvenablebutton->setEnabled(true);
       break;
     case kDAQStatusStarted:
       ui_->daqstatus->setText(QString("Status: DAQ acquiring"));
@@ -108,7 +122,7 @@ void DAQControlWidget::Update() {
       palette.setColor(ui_->daqbox->backgroundRole(), Qt::green);
       ui_->daqbox->setPalette(palette);
 
-      ui_->hvenablebutton->setEnabled(true);
+      //Make sure that the output file name and reference time cannot be changed mid-acquisition:
       ui_->outFileName->setEnabled(false);
       ui_ ->refTime->setEnabled(false);
       break;
@@ -118,12 +132,13 @@ void DAQControlWidget::Update() {
 
   // HV status
   if(daq_status_ != kDAQStatusUnknown){
+      //Ask Lynx for HV status if connected:
       hv_status_ = daq_thread_->IsHVOn();
       hv_volts_ = daq_thread_->HV();
   }
-  else{ hv_status_ = 3;}
+  else{ hv_status_ = 3;} //not connected to Lynx
 
-  // HV status
+  //First 4 lines of each case update the display in the HV information box.
   switch (hv_status_) {
     case kHVStatusUnknown:
       ui_->hvstatus->setText(QString("Status: Unknown"));
@@ -153,13 +168,16 @@ void DAQControlWidget::Update() {
       break;
   }
 
+  //Display voltage reading:
   if (hv_status_ == kHVStatusUnknown) {
     ui_->hvvoltage->setText(QString("Voltage: Unknown"));
   } else {
     ui_->hvvoltage->setText(QString("Voltage: ")+QString::number((int)hv_volts_));
   }
+  //Set voltage progress bar:
   ui_->hvprogressbar->setValue(abs((int)hv_volts_));
 
+  //If connected, update the live and real times.
   if(daq_status_!=kDAQStatusUnknown){
       QString live,real;
       live.sprintf("%.2f",daq_thread_->LiveTime()/1000000);
@@ -169,11 +187,12 @@ void DAQControlWidget::Update() {
   }
 }
 
+//The user has a few seconds after clicking this button before the HV controls are disabled again:
 void DAQControlWidget::EnableHVControl() {
   if (daq_status_ != kHVStatusUnknown) {
     if (!hv_enabled_) {
       hv_enabled_ = true;
-      hv_enable_timer_->start();
+      hv_enable_timer_->start();  //Starts HV timer.  If this expires, HV control will be disabled again.
       ui_->hvon->setEnabled(true);
       ui_->hvoff->setEnabled(true);
     } else if (hv_enabled_) {
@@ -191,43 +210,49 @@ void DAQControlWidget::DisableHVControl() {
   }
 }
 
+//What happens when you press Start/Stop:
 void DAQControlWidget::StartStopAcq(){
     //Connect first if not connected already.
     if(!daq_thread_->IsConnected()){Connect(); return;}
 
-    if (daq_status_ == kDAQStatusStarted){
-        if(!reg_started_){
-            daq_thread_->StopDataAcquisition();
+    if (daq_status_ == kDAQStatusStarted){ //if acquisition has already started
+        if(!reg_started_){  //but the regulator hasn't (acquisition had started outside the GUI)
+            daq_thread_->StopDataAcquisition(); //stop acquisition without doing anything else.
             return;
         }
-
+        //Otherwise, the regulator has started.
         daq_thread_->StopCollection();
         ui_->daqstartstop->setEnabled(false); //Disable button until it fully stops.
-        GRISleep::msleep(2500);
+        GRISleep::msleep(2500); //Wait until the appropriate threads have stopped.
         ui_->daqstartstop->setEnabled(true);
     }
-    else if(!reg_started_) {
-        //Send file name and prevent further file name changes:
+    else if(!reg_started_) { //if the regulators haven't been started (this is the first time you've hit start/stop)
+        //Send file name/reference time and prevent further file name changes:
         an_thread_->setFileName(ui_->outFileName->toPlainText().toStdString()+".txt");
         ui_->outFileName->setEnabled(false);
         daq_thread_->setRefTime(ui_->refTime->dateTime());
         ui_ ->refTime->setEnabled(false);
 
+        //Display the acquisition start time:
         ui_->startTime->setText(QDateTime::currentDateTime().toString("dd.MMM.yyyy hh:mm:ss.zzz"));
 
         ui_->daqstartstop->setEnabled(false); //Disable button until it starts up
-        reg->Start();
+        reg->Start(); //Start the regulators.
         reg_started_ = true;
-        GRISleep::msleep(1000);
+        GRISleep::msleep(1000);//Wait until the appropriate threads have stopped.
         ui_->daqstartstop->setEnabled(true);
     }
-    else{
-        //Send file name and prevent further file name changes:
+    else{  //regulators have already started, but acquisition is currently stopped:
+        //Send file name/reference time and prevent further file name changes:
         an_thread_->setFileName(ui_->outFileName->toPlainText().toStdString()+".txt");
         ui_->outFileName->setEnabled(false);
         daq_thread_->setRefTime(ui_->refTime->dateTime());
         ui_ ->refTime->setEnabled(false);
 
+        //Display the new acquisition start time:
+        ui_->startTime->setText(QDateTime::currentDateTime().toString("dd.MMM.yyyy hh:mm:ss.zzz"));
+
+        //Start data acquisition without restarting all the regulators and stuff:
         daq_thread_->StartCollection();
     }
 }

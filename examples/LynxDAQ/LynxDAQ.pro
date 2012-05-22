@@ -41,7 +41,8 @@ HEADERS += \
     include/LynxDAQ.h \
     include/SIMAnalysisThread.h \
     include/ActivityCounter.h \
-    include/DAQControlWidget.h
+    include/DAQControlWidget.h \
+    include/utilities.h
 
 ##
 # Please fill in GRIFDIR and ROOTDIR with the appropriate paths
@@ -100,9 +101,6 @@ LIBS += $$LYNXDIR/OleHlpr.lib
 LIBS += $$LYNXDIR/Serialization.lib
 LIBS += $$LYNXDIR/Utility.lib
 
-#Utilities.h:
-INCLUDEPATH+="C:/Canberra/SDK/CPPExamples/Examples/Include"
-INCLUDEPATH+="C:/Canberra/SDK/CPPExamples/Examples/ExampleList"
 
 
 #Need the following for some of the functions used in Utilities.h:

@@ -17,6 +17,8 @@ LynxDAQ::~LynxDAQ() {
 
 
 GRIDAQBaseAccumNode* LynxDAQ::RegisterDataOutput(QString outName) {
+    //Initialize accumulators.
+    //Need to make sure the variable types match the variable types that you post with PostData
   GRIDAQBaseAccumNode* p = NULL;
   if (outName == "ADCOutput") {
     p = new GRIDAQAccumulator<double>(outName,1e6,5,250);
@@ -26,22 +28,21 @@ GRIDAQBaseAccumNode* LynxDAQ::RegisterDataOutput(QString outName) {
   return p;
 }
 
-int LynxDAQ::ConnectToDAQ(){
+int LynxDAQ::ConnectToDAQ(){//Open a connection to the device
     try{
-        //Open a connection to the device
-        if(isConnected){
+        if(isConnected){ //If already connected, recreate a new instance of lynx.
             //Release ownership
             lynx->UnlockInput (_bstr_t("administrator"), _bstr_t("password"), input);
             cout<<"Released ownership."<<endl;
 
             lynx = Utilities::Device();
             isConnected=false;
-            cout<<"No Problems here."<<endl;
         }
         bstr_t lynxAddress;
         if (LYNX_DEFAULT){lynxAddress = LYNX_IPADDRESS;}
-        else{lynxAddress = Utilities::getLynxAddress ();}
+        else{lynxAddress = Utilities::getLynxAddress ();} //Ask for Lynx address if not on default.
         lynx->Open(Utilities::getLocalAddress (lynxAddress), lynxAddress);
+
         //Display the name of the lynx
         cout << "You are connected to: " << Utilities::GetString ((bstr_t)(lynx->GetParameter (DevCntl::Network_MachineName, (short) 0))) << "\n";
         isConnected = true;
@@ -59,14 +60,15 @@ int LynxDAQ::ConnectToDAQ(){
 }
 
 int LynxDAQ::LoadConfiguration(){
-    cout<<"Lodaing Configuration"<<endl;
-
-    cout<<lynx<<endl;
     if(LYNX_DEFAULT){
         LoadDefaultConfigs();
         return 0;
     }
 
+    //The code below was supplied by Lynx to manually set the configuration.
+    //  It has not been tested with the rest of this DAQ thread.
+
+    /*
     Utilities::disableAcquisition(lynx, input);
     cout<<"Disabled acquisition."<<endl;
 
@@ -100,6 +102,7 @@ int LynxDAQ::LoadConfiguration(){
         variant_t preset = variant_t ((double)2);
         lynx->PutParameter ((DevCntl::PresetLiveTime == (LONG) presetMode) ? DevCntl::Preset_Live : DevCntl::Preset_Real, input, &preset);
     }
+    */
     return 0;
 }
 
@@ -110,7 +113,6 @@ int LynxDAQ::Initialize(){
     lynx->Control (DevCntl::Clear, input, &Args);
 
     TurnOnHV();
-
     //Wait till ramped
     while(VARIANT_TRUE == (VARIANT_BOOL)(variant_t)(lynx->GetParameter (DevCntl::Input_VoltageRamping, input)))
     {
@@ -132,26 +134,28 @@ int LynxDAQ::StartDataAcquisition() {
   InitializeAccumulators(start_time_,0);
 
   //Clear the memory and start the acquisition
-  cout<<"About to clear memory"<<endl;
   lynx->Control (DevCntl::Clear, input, &Args);
-  cout<<"Cleared memory"<<endl;
   lynx->Control (DevCntl::Start, input, &Args);
-  cout<<"Started Acq."<<endl;
 
   return 0;
 }
 
 int LynxDAQ::AcquireData(int n) {
     cout<<"Acquiring Data..."<<endl;
-    //Get the list data
+
+
+    //Get the list data from lynx
     variant_t listB = lynx->GetListData (input);
 
     //Set the proper time base:
     timeBase=Utilities::Get1DSafeArrayElement (listB, 4);
     double cnv = (double)timeBase/1000; //Convert to uS
 
+    //Get Event/Time list:
     variant_t tlistD = Utilities::Get1DSafeArrayElement (listB, 6);
+    //# of elements in tlistD (note that this is NOT the # of events due to rollover bits)
     LONG numE = Utilities::GetCount (tlistD);
+
     static const long ROLLOVERBIT=0x00008000;
     static unsigned __int64 RolloverTime=0;
     unsigned short recTime=0, recEvent=0;
@@ -167,6 +171,7 @@ int LynxDAQ::AcquireData(int n) {
         recEvent = Utilities::Get1DSafeArrayElement (tlistD, i);
         recTime = Utilities::Get1DSafeArrayElement (tlistD, i + 1);
 
+        //Deal with the fact that some timestamps may be sent in two entries due to excess length:
         if (!(recTime&ROLLOVERBIT)) {
             Time = RolloverTime | (recTime & 0x7FFF);
         }
@@ -181,26 +186,31 @@ int LynxDAQ::AcquireData(int n) {
             continue;
         }
 
+        //Store the data to be posted:
         ADC.push_back((double)recEvent);
         ts.push_back((qint64)(Time*cnv));
+        //Edit the time stamp so that it's in seconds relative to ref_time
         ts_sec.push_back((double)(Time*cnv)/1e6+(double)dt/1000);
+
+        //Reset the timestamp and repeat
         Time=0;
     }
 
     PostData<double>(ADC.size(), "ADCOutput",&ADC[0],&ts[0]);
     PostData<double>(ADC.size(), "TS",&ts_sec[0],&ts[0]);
-    //cout<<"Just posted"<<endl;
 
+    //Update the real/live times - this is important for checking if the systme is in acquisition.
     currRealTime = RealTime();
     currLiveTime = LiveTime();
     return 0;
 }
 
 int LynxDAQ::StopDataAcquisition(){
-    cout<<"About to disable acquisition..."<<endl;
+    //cout<<"About to disable acquisition..."<<endl;
     Utilities::disableAcquisition(lynx, input);
     cout<<"Disabled Acquisition"<<endl;
 
+    //Update the real/live times - this is important for checking if the systme is in acquisition.
     currRealTime = RealTime();
     currLiveTime = LiveTime();
 
@@ -208,7 +218,6 @@ int LynxDAQ::StopDataAcquisition(){
 }
 
 void LynxDAQ::LoadDefaultConfigs(){
-
     Utilities::disableAcquisition(lynx, input);
     cout<<"Disabled acquisition."<<endl;
 
@@ -256,6 +265,6 @@ int LynxDAQ::IsHVOn(){
 }
 double LynxDAQ::HV(){
     double volt = lynx->GetParameter(DevCntl::Input_VoltageReading, input);
-    return (double)volt;
+    return volt;
 }
 

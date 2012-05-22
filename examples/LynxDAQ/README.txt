@@ -13,3 +13,8 @@ Operation:
 
 Output data will be formated as follows: Each line will have two numbers separated by a tab - the first is the bin number (uncalibrated energy) and the second is an arbitrary timestamp in seconds (relative to May 1st 2012, 12:00:00am).
 
+
+NOTES:
+-The real/live time will display the ending real and live times of the last run if the system is not currently in acquisition.
+-Please wait 3 seconds before touching anything after you've hit Start/Stop.
+

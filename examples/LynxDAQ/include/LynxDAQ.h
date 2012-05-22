@@ -1,8 +1,8 @@
 #ifndef LYNXDAQ_H
 #define LYNXDAQ_H
 
-#define LYNX_IPADDRESS L"10.0.0.3"
-#define LYNX_DEFAULT 1
+#define LYNX_IPADDRESS L"10.0.0.3" //Default IP address of Lynx
+#define LYNX_DEFAULT 1 //Set to 1 to have default settings.  This program has not been tested for nondefault settings.
 
 #include <core/GRIDAQThread.h>
 #include "Utilities.h"
@@ -31,6 +31,9 @@ class LynxDAQ : public GRIDAQThread {
   double HV(); // Returns current value of the voltage
 
   bool IsConnected(){return isConnected;}
+  //Check whether the systme is acquiring by seeing whether the current
+  //    live time matches that of the previously stored live time.  (If it's acquiring,
+  //    LiveTime() will be growing quickly.)
   bool IsAcquiring(){return (LiveTime()-currLiveTime>0.01);}
   //Return real and live times in seconds:
   double LiveTime(){return (double)lynx->GetParameter(DevCntl::Elapsed_Live, input);}
@@ -41,12 +44,12 @@ class LynxDAQ : public GRIDAQThread {
   QDateTime getRefTime(){return ref_time_;}
 
  private:
-  long input;
-  double currLiveTime;
+  long input; //Set to 1
+  double currLiveTime; //Live and real times currently stored by Lynx (either for this acquisition or a previous one)
   double currRealTime;
   DevCntl::IDevicePtr lynx;
-  VARIANT Args;
-  variant_t timeBase;
+  VARIANT Args; //Lynx related parameter.. has to do with the device's current setup?
+  variant_t timeBase; //Lynx related parameter.. has something to do with how timestamps are output.
 
   QDateTime start_time_;
   QDateTime ref_time_; //Reference time for timestamps.

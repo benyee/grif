@@ -35,7 +35,7 @@ SIMAnalysisThread::~SIMAnalysisThread() {
 }
 
 int SIMAnalysisThread::Analyze() {
-    double* ADC;
+    double* ADC; //bin number or energy
     double* ts_sec; //timestamp in seconds
     int nADC;
 
@@ -48,14 +48,17 @@ int SIMAnalysisThread::Analyze() {
     std::vector<double>::iterator itr_oldadc = storedEvents.first.begin();
     std::vector<double>::iterator itr_oldts = storedEvents.second.begin();
 
-    //Erase old data
     if(nADC> 0){
+        //Erase old data by iterating through and seeing how current
+        //  the timestamp is relative to the new data:
         while(itr_oldadc < storedEvents.first.end() && ts_sec[nADC-1] - *itr_oldts > dataLength){
             storedEvents.first.erase(storedEvents.first.begin());
             storedEvents.second.erase(storedEvents.second.begin());
             itr_oldadc++;
             itr_oldts++;
         }
+
+        //Write new raw data to file and store it:
         std::fstream outfile(filename,std::ios::app);
         for(int i = 0; i < nADC; i++){
             outfile<< ADC[i]<<'\t'<<std::setprecision(25)<<ts_sec[i]<<'\n';
@@ -64,7 +67,7 @@ int SIMAnalysisThread::Analyze() {
         }
         outfile.close();
     }
-    std::cout<<"Analyzed"<<std::endl;
+    std::cout<<"Finished analysis sequence."<<std::endl;
 
     return 0;
 }

@@ -5,6 +5,16 @@
 #include <QPair>
 #include <iostream>
 
+/*  This keeps track of the activity in a certain ROI.  Create one instance for each ROI you want to track.
+  It will examine the data and count the number of hits in "dt"-width time windows.  After it has traversed
+  all the data in a given time window, it will calculate the activity appropriately (counts divided by dt) and
+  move onto the next time window to count.  The program updates "currtime" when it needs to move to the next time window.
+
+  Use addData() to pass it raw data - the data can be in packets, you will just call addData() multiple times.
+  Retrieve the activity data (time stamped by the central time of each time window) using getPlotData().
+
+  Please note that I haven't had too much time to test this, so it might be VERY buggy.
+  */
 class ActivityCounter{
 public:
     ActivityCounter(int input_ROIL, int input_ROIR,double input_dt,double input_currtime = 0);
@@ -12,6 +22,7 @@ public:
 
     void setTimeStep(double x){dt = x;}
     double getTimeStep(){return dt;}
+    /// set currtime (left boundary of current time interval)
     void setTime(double x){currtime = x;}
 
     void resetLROI(int x){leftROI = x;}

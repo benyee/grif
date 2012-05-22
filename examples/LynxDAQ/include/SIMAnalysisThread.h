@@ -30,7 +30,7 @@
 
 class SIMAnalysisThread : public GRIAnalysisThread {
  public:
-    SIMAnalysisThread(double x = 60, std::string s = "out.txt");
+    SIMAnalysisThread(double x = 60, std::string s = "out.txt"); //Set the default storage time and output file name.
     ~SIMAnalysisThread();
 
     int Analyze();
@@ -40,12 +40,12 @@ class SIMAnalysisThread : public GRIAnalysisThread {
 
  private:
     QPair<std::vector<double>,std::vector<double> > storedEvents;
-    //This Qpair will store all the events of the last minute.
+    //This Qpair will store all the events of within the last dataLength of acquisition time.
 
     double dataLength; //Time interval of data storage.
     //(e.g. Setting dataLength to 10000 will mean that storedEvents has
     //  has the data from the last 10000 [insert units of the timestamp here] of collection)
-    //  Default for LynxDAQ is microseconds.
+    //  Default for LynxDAQ output from the TS ReadData is in seconds.
 
     std::string filename;  //File name for raw data output.
 };

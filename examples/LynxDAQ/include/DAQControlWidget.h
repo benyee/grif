@@ -6,6 +6,8 @@
 #include "SIMAnalysisThread.h"
 #include <QTimer>
 
+/*  This widget serves as a GUI control for the Lynx DAQ system. */
+
 namespace Ui {
     class DAQControlWidget;
 }
@@ -30,9 +32,9 @@ public:
   void set_hv_volts_max(double hv_max);
 
 private:
-    LynxDAQ *daq_thread_;
-    SIMAnalysisThread *an_thread_;
-    GRIRegulator *reg;
+    LynxDAQ *daq_thread_; /// Pointer to the Lynx DAQ class, provides access to the Lynx hardware
+    SIMAnalysisThread *an_thread_; /// Pointer to the analysis class, provides access to data output
+    GRIRegulator *reg; /// Pointer to regulator, allows us to start/stop the threads
     Ui::DAQControlWidget *ui_;
 
     bool reg_started_; /// whether the regulator has been started
@@ -48,12 +50,12 @@ private:
 signals:
 
 private slots:
-    void EnableHVControl();
-    void DisableHVControl();
+    void EnableHVControl(); //Allow access to HV On/Off buttons.
+    void DisableHVControl(); //Disable access to HV On/Off buttons.
     void SetHVOn(){daq_thread_->TurnOnHV();}
     void SetHVOff(){daq_thread_->TurnOffHV();}
-    void Update();
-    void StartStopAcq();
+    void Update();  //Refreshes the GUI, checking for new signals/updates
+    void StartStopAcq();  //Deals with what happens when you press the Start/Stop button
     void Connect(){daq_thread_->ConnectToDAQ();}
 };
 
