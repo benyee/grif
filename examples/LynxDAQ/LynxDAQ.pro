@@ -35,14 +35,16 @@ SOURCES += \
     src/LynxDAQ.cpp \
     src/SIMAnalysisThread.cpp \
     src/ActivityCounter.cpp \
-    src/DAQControlWidget.cpp
+    src/DAQControlWidget.cpp \
+    src/AnalysisWidget.cpp
 
 HEADERS += \
     include/LynxDAQ.h \
     include/SIMAnalysisThread.h \
     include/ActivityCounter.h \
     include/DAQControlWidget.h \
-    include/utilities.h
+    include/utilities.h \
+    include/AnalysisWidget.h
 
 ##
 # Please fill in GRIFDIR and ROOTDIR with the appropriate paths
@@ -108,6 +110,7 @@ LIBS+="C:/Program Files/Microsoft SDKs/Windows/v7.0A/Lib/WS2_32.lib"
 LIBS+="C:/Program Files/Microsoft SDKs/Windows/v7.0A/Lib/IPHlpApi.lib"
 
 FORMS += \
-    src/DAQControlWidget.ui
+    src/DAQControlWidget.ui \
+    src/AnalysisWidget.ui
 
 

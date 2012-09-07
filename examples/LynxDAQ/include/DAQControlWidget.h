@@ -5,6 +5,7 @@
 #include "LynxDAQ.h"
 #include "SIMAnalysisThread.h"
 #include <QTimer>
+#include <string>
 
 /*  This widget serves as a GUI control for the Lynx DAQ system. */
 
@@ -30,6 +31,7 @@ public:
   static const int kHVStatusRamping;
 
   void set_hv_volts_max(double hv_max);
+
 
 private:
     LynxDAQ *daq_thread_; /// Pointer to the Lynx DAQ class, provides access to the Lynx hardware

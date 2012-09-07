@@ -14,6 +14,8 @@
 #include <core/GRIMemoryManager.h>
 #include <core/GRIRegulator.h>
 
+
+#include "AnalysisWidget.h"
 #include "DAQControlWidget.h"
 #include "SIMAnalysisThread.h"
 
@@ -37,8 +39,11 @@ int main(int argc, char* argv[])
     p->push_back(lynx);
     p->push_back(AMC1);
 
-    DAQControlWidget* gui = new DAQControlWidget(0,lynx,AMC1,reg);
-    gui->show();
+    DAQControlWidget* controlGUI = new DAQControlWidget(0,lynx,AMC1,reg);
+    controlGUI->show();
+
+    AnalysisWidget* analysisGUI = new AnalysisWidget(0,lynx,AMC1,reg);
+    analysisGUI->show();
 
     /*
     //Included for all programs:
@@ -48,6 +53,23 @@ int main(int argc, char* argv[])
     GRISleep::msleep(5000);
     std::cout << "done..." << std::endl;
     */
+
+
+//    // Set up some test GUI windows
+//    QMainWindow *win1 = new QMainWindow();
+//    GRIHist1DWidget *histDraw1 = new GRIHist1DWidget(win1);
+//    win1->setCentralWidget(histDraw1);
+//    histDraw1->setWindowTitle("ADC Channel 0");
+//    histDraw1->set_hist(AMC1->GetHistogram("ADC Channel 0"));
+//    histDraw1->Initialize();
+//    histDraw1->set_foreground_color(Qt::cyan);
+//    histDraw1->set_background_color(Qt::darkBlue);
+//    histDraw1->set_outline_color(Qt::cyan);
+//    histDraw1->set_xlabel("Channel");
+//    histDraw1->set_ylabel("Counts");
+//    win1->setWindowTitle("1D Histogram");
+//    win1->resize(450,300);
+//    win1->show();
 
     return app.exec();
 }

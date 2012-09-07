@@ -34,9 +34,11 @@ class SIMAnalysisThread : public GRIAnalysisThread {
     ~SIMAnalysisThread();
 
     int Analyze();
+    void setFileName(std::string s,bool timestamp = false, std::string ext = ".txt");
 
     std::string getFileName(){return filename;}
-    void setFileName(std::string s){filename = s;}
+    double getDataLength(){return dataLength;}
+    void setDataLength(double x){dataLength = x;}
 
  private:
     QPair<std::vector<double>,std::vector<double> > storedEvents;

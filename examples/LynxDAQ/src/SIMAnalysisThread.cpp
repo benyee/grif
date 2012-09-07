@@ -28,7 +28,7 @@
 
 SIMAnalysisThread::SIMAnalysisThread(double x, std::string s) {
     dataLength = x;
-    filename = s;
+    setFileName(s);
 }
 
 SIMAnalysisThread::~SIMAnalysisThread() {
@@ -58,8 +58,9 @@ int SIMAnalysisThread::Analyze() {
             itr_oldts++;
         }
 
-        //Write new raw data to file and store it:
+        //Write new raw data to file and then store it:
         std::fstream outfile(filename,std::ios::app);
+        std::fstream dsafdsafds(filename,std::ios::app);
         for(int i = 0; i < nADC; i++){
             outfile<< ADC[i]<<'\t'<<std::setprecision(25)<<ts_sec[i]<<'\n';
             storedEvents.first.push_back(ADC[i]);
@@ -72,3 +73,11 @@ int SIMAnalysisThread::Analyze() {
     return 0;
 }
 
+void SIMAnalysisThread::setFileName(std::string s,bool timestamp, std::string ext){
+    if (timestamp){
+            std::string temp = QDateTime::currentDateTime().toString("yyyyMMdd_hhmm_ss_zzz").toStdString();
+            filename = s +"_"+ temp + ext;
+    }
+    else{filename = s + ext;}
+
+}

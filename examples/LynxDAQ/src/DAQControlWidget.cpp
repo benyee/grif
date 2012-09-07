@@ -3,6 +3,10 @@
 #include "DAQControlWidget.h"
 #include "ui_DAQControlWidget.h"
 
+#include <iomanip>
+#include <iostream>
+#include <fstream>
+
 const int DAQControlWidget::kDAQStatusUnknown     = 0;
 const int DAQControlWidget::kDAQStatusConnected   = 1;
 const int DAQControlWidget::kDAQStatusStarted     = 2;
@@ -215,36 +219,61 @@ void DAQControlWidget::StartStopAcq(){
     //Connect first if not connected already.
     if(!daq_thread_->IsConnected()){Connect(); return;}
 
+    ui_->daqstartstop->setEnabled(false);
     if (daq_status_ == kDAQStatusStarted){ //if acquisition has already started
-        if(!reg_started_){  //but the regulator hasn't (acquisition had started outside the GUI)
+        //Display the acquisition end time:
+        ui_->endTime->setText("End Time: " + QDateTime::currentDateTime().toString("dd.MMM.yyyy hh:mm:ss.zzz"));
+
+        //Record the action in the log file:
+        std::fstream logfile(ui_->logFileName->toPlainText().toStdString()+".txt",std::ios::app);
+        logfile<< QDateTime::currentDateTime().toString("(yyyy, MMM dd; hh:mm:ss.zzz) ").toStdString() + " Stopping acquisition"<<'\n';
+        QString live,real;
+        live.sprintf("%.2f",daq_thread_->LiveTime()/1000000);
+        real.sprintf("%.2f",daq_thread_->RealTime()/1000000);
+        logfile<<"Live Time: "<<live.toStdString()<<" s"<<'\n';
+        logfile<<"Real Time: "<<real.toStdString()<<" s"<<'\n';
+        logfile<< "=================================="<<'\n';
+        logfile.close();
+
+        if(!reg_started_){  //the regulator hasn't started (acquisition had started outside the GUI)
             daq_thread_->StopDataAcquisition(); //stop acquisition without doing anything else.
+            ui_->daqstartstop->setEnabled(true);
             return;
         }
+
         //Otherwise, the regulator has started.
         daq_thread_->StopCollection();
+
         ui_->daqstartstop->setEnabled(false); //Disable button until it fully stops.
         GRISleep::msleep(2500); //Wait until the appropriate threads have stopped.
         ui_->daqstartstop->setEnabled(true);
     }
     else if(!reg_started_) { //if the regulators haven't been started (this is the first time you've hit start/stop)
         //Send file name/reference time and prevent further file name changes:
-        an_thread_->setFileName(ui_->outFileName->toPlainText().toStdString()+".txt");
+        an_thread_->setFileName(ui_->outFileName->toPlainText().toStdString());
         ui_->outFileName->setEnabled(false);
         daq_thread_->setRefTime(ui_->refTime->dateTime());
         ui_ ->refTime->setEnabled(false);
 
         //Display the acquisition start time:
-        ui_->startTime->setText(QDateTime::currentDateTime().toString("dd.MMM.yyyy hh:mm:ss.zzz"));
+        ui_->startTime->setText("Start Time: " +QDateTime::currentDateTime().toString("dd.MMM.yyyy hh:mm:ss.zzz"));
 
         ui_->daqstartstop->setEnabled(false); //Disable button until it starts up
         reg->Start(); //Start the regulators.
         reg_started_ = true;
+
+        //Record the action in the log file:
+        std::fstream logfile(ui_->logFileName->toPlainText().toStdString()+".txt",std::ios::app);
+        logfile<< "=================================="<<'\n';
+        logfile<< QDateTime::currentDateTime().toString("(yyyy, MMM dd; hh:mm:ss.zzz) ").toStdString() + " Starting acquisition"<<'\n';
+        logfile.close();
+
         GRISleep::msleep(1000);//Wait until the appropriate threads have stopped.
         ui_->daqstartstop->setEnabled(true);
     }
     else{  //regulators have already started, but acquisition is currently stopped:
         //Send file name/reference time and prevent further file name changes:
-        an_thread_->setFileName(ui_->outFileName->toPlainText().toStdString()+".txt");
+        an_thread_->setFileName(ui_->outFileName->toPlainText().toStdString());
         ui_->outFileName->setEnabled(false);
         daq_thread_->setRefTime(ui_->refTime->dateTime());
         ui_ ->refTime->setEnabled(false);
@@ -252,7 +281,15 @@ void DAQControlWidget::StartStopAcq(){
         //Display the new acquisition start time:
         ui_->startTime->setText(QDateTime::currentDateTime().toString("dd.MMM.yyyy hh:mm:ss.zzz"));
 
+
+        //Record the action in the log file:
+        std::fstream logfile(ui_->logFileName->toPlainText().toStdString()+".txt",std::ios::app);
+        logfile<< "=================================="<<'\n';
+        logfile<< QDateTime::currentDateTime().toString("(yyyy, MMM dd; hh:mm:ss.zzz) ").toStdString() + " Starting acquisition"<<'\n';
+        logfile.close();
+
         //Start data acquisition without restarting all the regulators and stuff:
         daq_thread_->StartCollection();
     }
+    ui_->daqstartstop->setEnabled(true);
 }

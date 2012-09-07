@@ -68,6 +68,7 @@ int SIMMCAnalysisThread::Analyze() {
     QString histname = "ADC Channel "+QString::number(Ch1[i]);
     if (GetHistogram(histname)) {
       UpdateHistogram(histname, &(ADC1[i]),1);
+      std::cout<<ADC1[i]<<std::endl;
     } else {
       std::cerr << "SIMMCAnalysisThread::Analyze: ADC1 channel out of range!  ch="
 		<< Ch1[i] << std::endl;

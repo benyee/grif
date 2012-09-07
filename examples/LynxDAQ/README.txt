@@ -16,5 +16,5 @@ Output data will be formated as follows: Each line will have two numbers separat
 
 NOTES:
 -The real/live time will display the ending real and live times of the last run if the system is not currently in acquisition.
--Please wait 3 seconds before touching anything after you've hit Start/Stop.
+-Please wait 5 seconds before touching anything after you've hit Start/Stop.
 
