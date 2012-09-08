@@ -75,7 +75,7 @@ int SIMAnalysisThread::Analyze() {
 
 void SIMAnalysisThread::setFileName(std::string s,bool timestamp, std::string ext){
     if (timestamp){
-            std::string temp = QDateTime::currentDateTime().toString("yyyyMMdd_hhmm_ss_zzz").toStdString();
+            std::string temp = QDateTime::currentDateTime().toString("yyyyMMdd__hhmm_ss_zzz").toStdString();
             filename = s +"_"+ temp + ext;
     }
     else{filename = s + ext;}

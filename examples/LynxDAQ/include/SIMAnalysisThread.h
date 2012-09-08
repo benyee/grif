@@ -34,7 +34,7 @@ class SIMAnalysisThread : public GRIAnalysisThread {
     ~SIMAnalysisThread();
 
     int Analyze();
-    void setFileName(std::string s,bool timestamp = false, std::string ext = ".txt");
+    void setFileName(std::string s,bool timestamp = true, std::string ext = ".txt");
 
     std::string getFileName(){return filename;}
     double getDataLength(){return dataLength;}

@@ -1,9 +1,9 @@
 
 #include <QPalette>
+#include <QInputDialog>
 
 #include "AnalysisWidget.h"
 #include "ui_AnalysisWidget.h"
-
 
 #include <config/GRILoader.h>
 #include <config/GRIUserLoader.h>
@@ -26,6 +26,7 @@ AnalysisWidget::AnalysisWidget(QWidget *parent,  LynxDAQ *daq,SIMAnalysisThread 
   ui_->setupUi(this);
 
   //Retrieve DAQ, analysis thread, and regulator pointers:
+  daq_thread_ = daq;
   an_thread_ = sat;
   reg = r;
   reg_started_ = false;
@@ -76,29 +77,87 @@ void AnalysisWidget::SetEndTimeToCurrent(){
 }
 
 void AnalysisWidget::CreateHistogram(){
+    //Get the number of channels:
+    int numChans;
+    //If not connected, user must manually input the number of channels:
+    if(!(daq_thread_->IsConnected())){
+        bool canContinue = false;
+            while (!canContinue){
+            bool ok;
+            QString text = QInputDialog::getText(0,"Number of Bins Required",
+                "Enter the number of bins or hit cancel and connect to the detector first:",
+                                                 QLineEdit::Normal,QString::null, &ok);
+            canContinue = true;
+            if(ok && (text.toInt() > 100000 || text.toInt() <= 0)){
+                canContinue = false;
+            }
+            else if( ok && !text.isEmpty()) {
+                numChans = text.toInt();
+                std::cout<<numChans<<endl;
+            } else {
+                return;
+            }
+        }
+    }else{
+        numChans = (int)(daq_thread_->getNumberofChannels());
+    }
+
     //Create/clear histogram:
     QString histname = "Hist";
-    if(!(an_thread_->CreateNewHistogram(histname,300,0.0,1000.0))){
+    if(an_thread_->CreateNewHistogram(histname,numChans,0,numChans)==0){
+    }else{
         an_thread_->ClearHistogram(histname);
     }
+
 
     // Set up GUI window
     QMainWindow *win1 = new QMainWindow();
     GRIHist1DWidget *histDraw1 = new GRIHist1DWidget(win1);
     win1->setCentralWidget(histDraw1);
-    histDraw1->set_hist(an_thread_->GetHistogram("hist"));
+    histDraw1->set_hist(an_thread_->GetHistogram(histname));
     histDraw1->Initialize();
     histDraw1->set_foreground_color(Qt::cyan);
     histDraw1->set_background_color(Qt::darkBlue);
     histDraw1->set_outline_color(Qt::cyan);
     if(ui_->convertButton->isChecked()){
-        histDraw1->set_xlabel("Channel");
-    }else{
         histDraw1->set_xlabel("Energy");
+    }else{
+        histDraw1->set_xlabel("Channel");
     }
     histDraw1->set_ylabel("Counts");
     win1->resize(450,300);
     win1->show();
+
+    //Time window:
+    int startTime = (ui_->refTime->dateTime()).secsTo(ui_->startTime->dateTime());
+    int endTime = (ui_->refTime->dateTime()).secsTo(ui_->endTime->dateTime());
+
+    //Open the file:
+    std::ifstream logfile(ui_->dataFileName->toPlainText().toStdString()+".txt");
+    while(!logfile.eof()){
+        //Get the next line in the file and store it:
+        std::string temp;
+        std::getline(logfile,temp);
+        //Last line of the file is thrown out since it's usually a carriage return: (break 1 line early)
+        if(logfile.eof()){
+            break;
+        }
+
+        //Find out index of tab in data list:
+        int firstEntryEnd = temp.find_first_of("\t");
+
+        //Get the timestamp for this row of data:
+        QString qstrTime = QString::fromStdString(temp.substr(firstEntryEnd+1));
+        double time = qstrTime.toDouble();
+        //If it's within the desired time range, add the channel # to our list:
+        if(time > startTime && time < endTime){
+            QString chan = QString::fromStdString(temp.substr(0,firstEntryEnd));
+            chans.append(chan.toDouble());
+            double doubleChan[1]; doubleChan[0] = chan.toDouble();
+            an_thread_->UpdateHistogram(histname,doubleChan,1);
+        }
+    }
+    logfile.close();
 
 
 }

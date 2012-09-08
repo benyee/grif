@@ -39,6 +39,11 @@ class LynxDAQ : public GRIDAQThread {
   double LiveTime(){return (double)lynx->GetParameter(DevCntl::Elapsed_Live, input);}
   double RealTime(){return (double)lynx->GetParameter(DevCntl::Elapsed_Real, input);}
 
+  long getNumberofChannels(){return lynx->GetParameter(DevCntl::Input_NumberOfChannels,input);}
+
+  DevCntl::IDevicePtr GetDeviceHandle(){return lynx;}
+  long getInputValue(){return input;}
+
   //Change/get reference time:
   void setRefTime(QDateTime q){ref_time_ = q;}
   QDateTime getRefTime(){return ref_time_;}
