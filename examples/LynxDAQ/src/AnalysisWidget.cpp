@@ -152,7 +152,7 @@ void AnalysisWidget::CreateHistogram(){
         //If it's within the desired time range, add the channel # to our list:
         if(time > startTime && time < endTime){
             QString chan = QString::fromStdString(temp.substr(0,firstEntryEnd));
-            chans.append(chan.toDouble());
+            //chan.append(chan.toDouble());
             double doubleChan[1]; doubleChan[0] = chan.toDouble();
             an_thread_->UpdateHistogram(histname,doubleChan,1);
         }
