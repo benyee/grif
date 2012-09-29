@@ -334,3 +334,13 @@ void DAQControlWidget::ToggleHist(){
         ui_->histEnd->setText("End Time: ???");
     }
 }
+
+void DAQControlWidget::ClearHist(){
+    an_thread_->ClearHistogram("Histogram");
+    ui_->histEnd->setText("End Time: ???");
+    if(hist_status){
+        ui_->histStart->setText("Start Time: " +QDateTime::currentDateTime().toString("dd.MMM.yyyy hh:mm:ss.zzz"));
+     }else{
+        ui_->histStart->setText("Start Time: ???");
+    }
+}

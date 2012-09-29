@@ -62,7 +62,7 @@ private slots:
     void StartStopAcq();  //Deals with what happens when you press the Start/Stop button
     void Connect(){daq_thread_->ConnectToDAQ();}
     void ToggleHist();
-    void ClearHist(){an_thread_->ClearHistogram("Histogram");}
+    void ClearHist();
 };
 
 #endif // GRIF_UI_DAQCONTROLWIDGET_H_

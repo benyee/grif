@@ -31,7 +31,7 @@ SIMAnalysisThread::SIMAnalysisThread(double x, std::string s) {
     setFileName(s);
 
     CreateNewHistogram("Histogram",8192,0.0,8192.0);
-    GetHistogram("Histogram")->set_rate_mode(true);
+    GetHistogram("Histogram")->set_rate_mode(false);
 }
 
 SIMAnalysisThread::~SIMAnalysisThread() {
@@ -49,7 +49,9 @@ int SIMAnalysisThread::Analyze() {
     QPair<int, double*> pADC = ReadData<double>("LynxDAQ","ADCOutput");
     ADC = pADC.second; nADC = pADC.first;
 
-    UpdateHistogram("Histogram",ADC,nADC);
+    if(isPlotting){
+        UpdateHistogram("Histogram",ADC,nADC);
+    }
 
     QPair<int, double*> pTS = ReadData<double>("LynxDAQ","TS");
     ts_sec = pTS.second;
