@@ -29,9 +29,16 @@
 SIMAnalysisThread::SIMAnalysisThread(double x, std::string s) {
     dataLength = x;
     setFileName(s);
+
+    CreateNewHistogram("Histogram",8192,0.0,8192.0);
+    GetHistogram("Histogram")->set_rate_mode(true);
 }
 
 SIMAnalysisThread::~SIMAnalysisThread() {
+}
+
+void SIMAnalysisThread::setBinning(int nBins, double xMax){
+    return;
 }
 
 int SIMAnalysisThread::Analyze() {
@@ -41,6 +48,8 @@ int SIMAnalysisThread::Analyze() {
 
     QPair<int, double*> pADC = ReadData<double>("LynxDAQ","ADCOutput");
     ADC = pADC.second; nADC = pADC.first;
+
+    UpdateHistogram("Histogram",ADC,nADC);
 
     QPair<int, double*> pTS = ReadData<double>("LynxDAQ","TS");
     ts_sec = pTS.second;

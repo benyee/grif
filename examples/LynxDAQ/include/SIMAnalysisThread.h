@@ -19,6 +19,9 @@
 // Contact:
 // Dr. Daniel Chivers
 // dhchivers@lbl.gov
+//*****************************************************
+//*****************************************************
+//This thread writes time and energy bin data to a .txt file and manages the spectrum/histogram.
 
 #ifndef GRIF_EXAMPLES_SIMULATOR_SIMANALYSISTHREAD_H_
 #define GRIF_EXAMPLES_SIMULATOR_SIMANALYSISTHREAD_H_
@@ -35,10 +38,13 @@ class SIMAnalysisThread : public GRIAnalysisThread {
 
     int Analyze();
     void setFileName(std::string s,bool timestamp = true, std::string ext = ".txt");
+    void setBinning(int nBins, double xMax);
 
     std::string getFileName(){return filename;}
     double getDataLength(){return dataLength;}
     void setDataLength(double x){dataLength = x;}
+    void setPlotStatus(bool x){isPlotting = x;}
+    bool getPlotStatus(){return isPlotting;}
 
  private:
     QPair<std::vector<double>,std::vector<double> > storedEvents;
@@ -50,6 +56,8 @@ class SIMAnalysisThread : public GRIAnalysisThread {
     //  Default for LynxDAQ output from the TS ReadData is in seconds.
 
     std::string filename;  //File name for raw data output.
+
+    bool isPlotting;
 };
 
 #endif  // GRIF_EXAMPLES_SIMULATOR_SIMANALYSISTHREAD_H_

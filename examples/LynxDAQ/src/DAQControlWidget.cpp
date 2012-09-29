@@ -31,7 +31,7 @@ DAQControlWidget::DAQControlWidget(QWidget *parent, LynxDAQ *daq, SIMAnalysisThr
 
   // set up a timer to update widget
   update_timer_ = new QTimer();
-  update_timer_->setInterval(500);
+  update_timer_->setInterval(1000);
   update_timer_->start();
 
   // set up timer to be used for HV enable
@@ -41,6 +41,12 @@ DAQControlWidget::DAQControlWidget(QWidget *parent, LynxDAQ *daq, SIMAnalysisThr
 
   //Update the page to make sure everything's good to go:
   Update();
+
+  QPalette palette;
+  palette = ui_->histbox->palette();
+  palette.setColor(ui_->histbox->backgroundRole(),Qt::yellow);
+  ui_->histbox->setPalette(palette);
+  hist_status = false;
 
   //start the signal and slot pairs...
   connect(update_timer_, SIGNAL(timeout()), this, SLOT(Update()));
@@ -53,6 +59,9 @@ DAQControlWidget::DAQControlWidget(QWidget *parent, LynxDAQ *daq, SIMAnalysisThr
 
   connect(ui_->daqconnect,SIGNAL(clicked()),this,SLOT(Connect()));
   connect(ui_->daqstartstop,SIGNAL(clicked()),this,SLOT(StartStopAcq()));
+
+  connect(ui_->histOnOff,SIGNAL(clicked()),this,SLOT(ToggleHist()));
+  connect(ui_->histClear,SIGNAL(clicked()),this,SLOT(ClearHist()));
 }
 
 
@@ -108,7 +117,7 @@ void DAQControlWidget::Update() {
     case kDAQStatusUnknown:
       ui_->daqstatus->setText(QString("Status: Unknown"));
       palette = ui_->daqbox->palette();
-      palette.setColor(ui_->daqbox->backgroundRole(), Qt::red);
+      palette.setColor(ui_->daqbox->backgroundRole(), Qt::lightGray);
       ui_->daqbox->setPalette(palette);
 
       //Disable the HV button since you're not connected anyway:
@@ -247,6 +256,10 @@ void DAQControlWidget::StartStopAcq(){
         ui_->daqstartstop->setEnabled(false); //Disable button until it fully stops.
         GRISleep::msleep(2500); //Wait until the appropriate threads have stopped.
         ui_->daqstartstop->setEnabled(true);
+
+        if(hist_status){
+            ToggleHist();
+        }
     }
     else if(!reg_started_) { //if the regulators haven't been started (this is the first time you've hit start/stop)
         //Send file name/reference time and prevent further file name changes:
@@ -257,6 +270,7 @@ void DAQControlWidget::StartStopAcq(){
 
         //Display the acquisition start time:
         ui_->startTime->setText("Start Time: " +QDateTime::currentDateTime().toString("dd.MMM.yyyy hh:mm:ss.zzz"));
+        ui_->startTime->setText("End Time: ???");
 
         ui_->daqstartstop->setEnabled(false); //Disable button until it starts up
         reg->Start(); //Start the regulators.
@@ -292,4 +306,31 @@ void DAQControlWidget::StartStopAcq(){
         daq_thread_->StartCollection();
     }
     ui_->daqstartstop->setEnabled(true);
+}
+
+void DAQControlWidget::ToggleHist(){
+    if(daq_status_!=kDAQStatusStarted){
+        return;
+    }
+    if(hist_status){
+        hist_status = false;
+        QPalette palette;
+        palette = ui_->histbox->palette();
+        palette.setColor(ui_->histbox->backgroundRole(),Qt::yellow);
+        ui_->histbox->setPalette(palette);
+        ui_->histstatus->setText("Status: Not Plotting");
+        an_thread_->setPlotStatus(false);
+        ui_->histEnd->setText("End Time: " +QDateTime::currentDateTime().toString("dd.MMM.yyyy hh:mm:ss.zzz"));
+
+    }else{
+        hist_status = true;
+        QPalette palette;
+        palette = ui_->histbox->palette();
+        palette.setColor(ui_->histbox->backgroundRole(),Qt::green);
+        ui_->histbox->setPalette(palette);
+        ui_->histstatus->setText("Status: Plotting!");
+        an_thread_->setPlotStatus(true);
+        ui_->histStart->setText("Start Time: " +QDateTime::currentDateTime().toString("dd.MMM.yyyy hh:mm:ss.zzz"));
+        ui_->histEnd->setText("End Time: ???");
+    }
 }

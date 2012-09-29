@@ -14,6 +14,8 @@
 #include <core/GRIMemoryManager.h>
 #include <core/GRIRegulator.h>
 
+#include <hist/GRIHistWidget.h>
+#include <hist/GRIHist1DWidget.h>
 
 #include "AnalysisWidget.h"
 #include "DAQControlWidget.h"
@@ -42,8 +44,23 @@ int main(int argc, char* argv[])
     DAQControlWidget* controlGUI = new DAQControlWidget(0,lynx,AMC1,reg);
     controlGUI->show();
 
-    AnalysisWidget* analysisGUI = new AnalysisWidget(0,lynx,AMC1,reg);
-    analysisGUI->show();
+
+    QMainWindow *win1 = new QMainWindow();
+    GRIHist1DWidget *histDraw1 = new GRIHist1DWidget(win1);
+    win1->setCentralWidget(histDraw1);
+    histDraw1->set_hist(AMC1->GetHistogram("Histogram"));
+    histDraw1->Initialize();
+    histDraw1->set_foreground_color(Qt::cyan);
+    histDraw1->set_background_color(Qt::darkBlue);
+    histDraw1->set_outline_color(Qt::cyan);
+    histDraw1->set_xlabel("Channel");
+    histDraw1->set_ylabel("Counts");
+    win1->resize(450,300);
+    win1->show();
+
+    //Ignore for now:
+//    AnalysisWidget* analysisGUI = new AnalysisWidget(0,lynx,AMC1,reg);
+//    analysisGUI->show();
 
     /*
     //Included for all programs:

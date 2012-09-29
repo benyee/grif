@@ -49,6 +49,8 @@ private:
     bool hv_enabled_;
     QTimer* hv_enable_timer_; /// timer for HV enable
 
+    bool hist_status;
+
 signals:
 
 private slots:
@@ -59,6 +61,8 @@ private slots:
     void Update();  //Refreshes the GUI, checking for new signals/updates
     void StartStopAcq();  //Deals with what happens when you press the Start/Stop button
     void Connect(){daq_thread_->ConnectToDAQ();}
+    void ToggleHist();
+    void ClearHist(){an_thread_->ClearHistogram("Histogram");}
 };
 
 #endif // GRIF_UI_DAQCONTROLWIDGET_H_
