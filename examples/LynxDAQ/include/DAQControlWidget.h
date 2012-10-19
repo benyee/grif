@@ -60,7 +60,8 @@ private slots:
     void SetHVOff(){daq_thread_->TurnOffHV();}
     void Update();  //Refreshes the GUI, checking for new signals/updates
     void StartStopAcq();  //Deals with what happens when you press the Start/Stop button
-    void Connect(){daq_thread_->ConnectToDAQ();}
+    void Connect();
+    void ToggleSim();
     void ToggleHist();
     void ClearHist();
 };

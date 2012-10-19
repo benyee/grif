@@ -2,7 +2,7 @@
 #define LYNXDAQ_H
 
 #define LYNX_IPADDRESS L"10.0.0.3" //Default IP address of Lynx
-#define LYNX_DEFAULT 1 //Set to 1 to have default settings.  This program has not been tested for nondefault settings.
+#define LYNX_DEFAULT 1 //Set to 1 to have default settings.  This program has not been tested for non-default settings.
 
 #include <core/GRIDAQThread.h>
 #include "Utilities.h"
@@ -39,6 +39,9 @@ class LynxDAQ : public GRIDAQThread {
   double LiveTime(){return (double)lynx->GetParameter(DevCntl::Elapsed_Live, input);}
   double RealTime(){return (double)lynx->GetParameter(DevCntl::Elapsed_Real, input);}
 
+  bool isSimMode(){return simMode;}
+  void setSimMode(bool x){simMode = x;}
+
   long getNumberofChannels(){return lynx->GetParameter(DevCntl::Input_NumberOfChannels,input);}
 
   DevCntl::IDevicePtr GetDeviceHandle(){return lynx;}
@@ -60,6 +63,8 @@ class LynxDAQ : public GRIDAQThread {
   QDateTime ref_time_; //Reference time for timestamps.
   qint64 dt; // milliseconds between start_time_ and REF_TIME
   bool isConnected;
+
+  bool simMode;
 
   void LoadDefaultConfigs();
 };

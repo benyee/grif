@@ -57,6 +57,7 @@ DAQControlWidget::DAQControlWidget(QWidget *parent, LynxDAQ *daq, SIMAnalysisThr
   connect(ui_->hvenablebutton, SIGNAL(clicked()), this, SLOT(EnableHVControl()));
   connect(hv_enable_timer_, SIGNAL(timeout()), this, SLOT(DisableHVControl()));
 
+  connect(ui_->simToggle,SIGNAL(clicked()),this,SLOT(ToggleSim()));
   connect(ui_->daqconnect,SIGNAL(clicked()),this,SLOT(Connect()));
   connect(ui_->daqstartstop,SIGNAL(clicked()),this,SLOT(StartStopAcq()));
 
@@ -222,6 +223,11 @@ void DAQControlWidget::DisableHVControl() {
     ui_->hvoff->setEnabled(false);
   }
 }
+void DAQControlWidget::Connect(){
+    daq_thread_->ConnectToDAQ();
+    ui_->simToggle->setEnabled(false);
+}
+
 
 //What happens when you press Start/Stop:
 void DAQControlWidget::StartStopAcq(){
@@ -343,4 +349,12 @@ void DAQControlWidget::ClearHist(){
      }else{
         ui_->histStart->setText("Start Time: ???");
     }
+}
+
+void DAQControlWidget::ToggleSim(){
+    bool simStatus = daq_thread_->isSimMode();
+    if(simStatus){
+        ui_->simToggle->setText("Simulation Mode OFF");
+    }else{ui_->simToggle->setText("Simulation Mode ON");}
+    daq_thread_->setSimMode(!simStatus);
 }

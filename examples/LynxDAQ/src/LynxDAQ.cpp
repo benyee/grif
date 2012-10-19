@@ -10,6 +10,8 @@ LynxDAQ::LynxDAQ() {
 
     currLiveTime = 0;
     currRealTime = 0;
+
+    simMode = false;
 }
 
 LynxDAQ::~LynxDAQ() {
@@ -29,6 +31,11 @@ GRIDAQBaseAccumNode* LynxDAQ::RegisterDataOutput(QString outName) {
 }
 
 int LynxDAQ::ConnectToDAQ(){//Open a connection to the device
+    if(simMode){
+        isConnected = true;
+        return 0;
+    }
+
     try{
         if(isConnected){ //If already connected, recreate a new instance of lynx.
             //Release ownership
@@ -60,10 +67,7 @@ int LynxDAQ::ConnectToDAQ(){//Open a connection to the device
 }
 
 int LynxDAQ::LoadConfiguration(){
-    if(LYNX_DEFAULT){
-        LoadDefaultConfigs();
-        return 0;
-    }
+    if(LYNX_DEFAULT && !simMode){LoadDefaultConfigs();}
 
     //The code below was supplied by Lynx to manually set the configuration.
     //  It has not been tested with the rest of this DAQ thread.
@@ -107,6 +111,9 @@ int LynxDAQ::LoadConfiguration(){
 }
 
 int LynxDAQ::Initialize(){
+    if(simMode){
+        return 0;
+    }
     cout<<"Initializing..."<<endl;
 
     //Clear data and time
@@ -133,9 +140,11 @@ int LynxDAQ::StartDataAcquisition() {
   dt = ref_time_.msecsTo(start_time_);
   InitializeAccumulators(start_time_,0);
 
-  //Clear the memory and start the acquisition
-  lynx->Control (DevCntl::Clear, input, &Args);
-  lynx->Control (DevCntl::Start, input, &Args);
+  if(!simMode){
+      //Clear the memory and start the acquisition
+      lynx->Control (DevCntl::Clear, input, &Args);
+      lynx->Control (DevCntl::Start, input, &Args);
+  }
 
   return 0;
 }
@@ -144,6 +153,22 @@ int LynxDAQ::AcquireData(int n) {
     cout<<"Acquiring Data..."<<endl;
 
 
+    if(simMode){
+        int numData = (int)(ceil((double)(rand()/RAND_MAX*10)));
+        vector<double> ADC;
+        vector<double> ts_sec;
+        vector<qint64> ts;
+
+        for(int i = 0; i<numData;i++){
+            ADC.push_back(ceil((double)rand()/RAND_MAX*8192));
+            if(i == 0){
+                ts.push_back((qint64)ceil((double)rand()/RAND_MAX*8192));
+            }else{
+                ts.push_back((qint64)ceil((double)rand()/RAND_MAX*8192)+ts[i-1]);
+            }
+            ts.push_back((double)ts[i]/1e6+(double)dt/1000);
+        }
+    }
     //Get the list data from lynx
     variant_t listB = lynx->GetListData (input);
 
@@ -182,7 +207,7 @@ int LynxDAQ::AcquireData(int n) {
             MSBofTC |= recEvent << 30;
             RolloverTime = MSBofTC | LSBofTC;
 
-            //goto next event
+            //go to next event
             continue;
         }
 
