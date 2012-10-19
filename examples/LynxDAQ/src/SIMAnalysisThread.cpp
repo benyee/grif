@@ -31,7 +31,8 @@ SIMAnalysisThread::SIMAnalysisThread(double x, std::string s) {
     setFileName(s);
 
     CreateNewHistogram("Histogram",8192,0.0,8192.0);
-    GetHistogram("Histogram")->set_rate_mode(false);
+    GetHistogram("Histogram")->set_rate_mode(true);
+    GetHistogram("Histogram")->set_packet_scale_factor(0.1);
 }
 
 SIMAnalysisThread::~SIMAnalysisThread() {
