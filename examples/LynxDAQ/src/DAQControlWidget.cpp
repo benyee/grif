@@ -145,12 +145,12 @@ void DAQControlWidget::Update() {
   }
 
   // HV status
-  if(daq_status_ != kDAQStatusUnknown){
+  if(daq_status_ == kDAQStatusUnknown || daq_thread_->isSimMode()){ hv_status_ = 3;} //not connected to Lynx
+  else{
       //Ask Lynx for HV status if connected:
       hv_status_ = daq_thread_->IsHVOn();
       hv_volts_ = daq_thread_->HV();
   }
-  else{ hv_status_ = 3;} //not connected to Lynx
 
   //First 4 lines of each case update the display in the HV information box.
   switch (hv_status_) {
@@ -201,9 +201,10 @@ void DAQControlWidget::Update() {
   }
 }
 
+
 //The user has a few seconds after clicking this button before the HV controls are disabled again:
 void DAQControlWidget::EnableHVControl() {
-  if (daq_status_ != kHVStatusUnknown) {
+  if (daq_status_ != kDAQStatusUnknown && !daq_thread_->isSimMode()) {
     if (!hv_enabled_) {
       hv_enabled_ = true;
       hv_enable_timer_->start();  //Starts HV timer.  If this expires, HV control will be disabled again.
@@ -216,7 +217,7 @@ void DAQControlWidget::EnableHVControl() {
 }
 
 void DAQControlWidget::DisableHVControl() {
-  if (daq_status_ != kHVStatusUnknown) {
+  if (daq_status_ != kDAQStatusUnknown) {
     hv_enabled_ = false;
     hv_enable_timer_->stop();
     ui_->hvon->setEnabled(false);

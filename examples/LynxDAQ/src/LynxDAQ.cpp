@@ -12,6 +12,8 @@ LynxDAQ::LynxDAQ() {
     currRealTime = 0;
 
     simMode = false;
+    simModeTime = 0;
+    isSimulating = 0;
 }
 
 LynxDAQ::~LynxDAQ() {
@@ -144,7 +146,7 @@ int LynxDAQ::StartDataAcquisition() {
       //Clear the memory and start the acquisition
       lynx->Control (DevCntl::Clear, input, &Args);
       lynx->Control (DevCntl::Start, input, &Args);
-  }
+  }else{isSimulating = 1;}
 
   return 0;
 }
@@ -154,20 +156,32 @@ int LynxDAQ::AcquireData(int n) {
 
 
     if(simMode){
-        int numData = (int)(ceil((double)(rand()/RAND_MAX*10)));
+        //We will generate a numData amount of random data points.
+        int numData = ceil((double)rand()/RAND_MAX*10);
         vector<double> ADC;
         vector<double> ts_sec;
         vector<qint64> ts;
+        qint64 Time;
 
         for(int i = 0; i<numData;i++){
+            //Generate a random event, with a timestamp a random time ahead of the previous one
             ADC.push_back(ceil((double)rand()/RAND_MAX*8192));
             if(i == 0){
-                ts.push_back((qint64)ceil((double)rand()/RAND_MAX*8192));
+                Time = ceil((double)rand()/RAND_MAX*1e6)+simModeTime;
             }else{
-                ts.push_back((qint64)ceil((double)rand()/RAND_MAX*8192)+ts[i-1]);
+                Time = ceil((double)rand()/RAND_MAX*1e6)+Time;
             }
-            ts.push_back((double)ts[i]/1e6+(double)dt/1000);
+            ts.push_back(Time);
+            ts_sec.push_back((double)Time/1e6+(double)dt/1000);
         }
+
+        simModeTime = Time;
+
+        PostData<double>(ADC.size(), "ADCOutput",&ADC[0],&ts[0]);
+        PostData<double>(ADC.size(), "TS",&ts_sec[0],&ts[0]);
+        cout<<"Posting data..."<<endl;
+
+        return 0;
     }
     //Get the list data from lynx
     variant_t listB = lynx->GetListData (input);
@@ -231,6 +245,11 @@ int LynxDAQ::AcquireData(int n) {
 }
 
 int LynxDAQ::StopDataAcquisition(){
+    if(simMode){
+        isSimulating = 0;
+        return 0;
+    }
+
     //cout<<"About to disable acquisition..."<<endl;
     Utilities::disableAcquisition(lynx, input);
     cout<<"Disabled Acquisition"<<endl;
@@ -265,6 +284,7 @@ void LynxDAQ::LoadDefaultConfigs(){
     variant_t presetMode = variant_t (DevCntl::PresetNone);
     lynx->PutParameter (DevCntl::Preset_Options, input, &presetMode);
 }
+
 void LynxDAQ::TurnOnHV(long v){
     //Turn on HV
     variant_t voltageStatus = VARIANT_TRUE;
@@ -274,13 +294,18 @@ void LynxDAQ::TurnOnHV(long v){
     variant_t voltage = v;
     lynx->PutParameter(DevCntl::Input_Voltage, input, &voltage);
 }
+
 void LynxDAQ::TurnOffHV(){
     //Turn off HV
     variant_t voltageStatus = VARIANT_FALSE;
     lynx->PutParameter (DevCntl::Input_VoltageStatus, input, &voltageStatus);
 }
+
 int LynxDAQ::IsHVOn(){
-    if(VARIANT_TRUE == (VARIANT_BOOL)(variant_t)(lynx->GetParameter (DevCntl::Input_VoltageRamping, input))){
+    if(simMode){
+        return 0;
+    }
+    else if(VARIANT_TRUE == (VARIANT_BOOL)(variant_t)(lynx->GetParameter (DevCntl::Input_VoltageRamping, input))){
         return 2;
     }
     else if(VARIANT_TRUE == (VARIANT_BOOL)(variant_t)(lynx ->GetParameter(DevCntl::Input_VoltageStatus,input))){
@@ -288,9 +313,12 @@ int LynxDAQ::IsHVOn(){
     }
     return 0;
 }
+
 double LynxDAQ::HV(){
+    if(simMode){return 0;}
     double volt = lynx->GetParameter(DevCntl::Input_VoltageReading, input);
     return volt;
 }
+
 
 

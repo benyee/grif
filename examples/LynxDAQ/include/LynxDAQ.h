@@ -34,15 +34,15 @@ class LynxDAQ : public GRIDAQThread {
   //Check whether the systme is acquiring by seeing whether the current
   //    live time matches that of the previously stored live time.  (If it's acquiring,
   //    LiveTime() will be growing quickly.)
-  bool IsAcquiring(){return (LiveTime()-currLiveTime>0.01);}
+  bool IsAcquiring(){if(simMode){return isSimulating;} return (LiveTime()-currLiveTime>0.01);}
   //Return real and live times in seconds:
-  double LiveTime(){return (double)lynx->GetParameter(DevCntl::Elapsed_Live, input);}
-  double RealTime(){return (double)lynx->GetParameter(DevCntl::Elapsed_Real, input);}
+  double LiveTime(){if (simMode){return 0.0;} return (double)lynx->GetParameter(DevCntl::Elapsed_Live, input);}
+  double RealTime(){if (simMode){return 0.0;} return (double)lynx->GetParameter(DevCntl::Elapsed_Real, input);}
 
   bool isSimMode(){return simMode;}
   void setSimMode(bool x){simMode = x;}
 
-  long getNumberofChannels(){return lynx->GetParameter(DevCntl::Input_NumberOfChannels,input);}
+  long getNumberofChannels(){if(simMode){return 8192;} return lynx->GetParameter(DevCntl::Input_NumberOfChannels,input);}
 
   DevCntl::IDevicePtr GetDeviceHandle(){return lynx;}
   long getInputValue(){return input;}
@@ -65,6 +65,8 @@ class LynxDAQ : public GRIDAQThread {
   bool isConnected;
 
   bool simMode;
+  bool isSimulating;
+  qint64 simModeTime;
 
   void LoadDefaultConfigs();
 };

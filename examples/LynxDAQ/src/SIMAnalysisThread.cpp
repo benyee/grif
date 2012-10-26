@@ -32,7 +32,7 @@ SIMAnalysisThread::SIMAnalysisThread(double x, std::string s) {
 
     CreateNewHistogram("Histogram",8192,0.0,8192.0);
     GetHistogram("Histogram")->set_rate_mode(true);
-    GetHistogram("Histogram")->set_packet_scale_factor(0.1);
+    GetHistogram("Histogram")->set_packet_scale_factor(0.01);
 }
 
 SIMAnalysisThread::~SIMAnalysisThread() {
@@ -57,27 +57,22 @@ int SIMAnalysisThread::Analyze() {
     QPair<int, double*> pTS = ReadData<double>("LynxDAQ","TS");
     ts_sec = pTS.second;
 
-    std::vector<double>::iterator itr_oldadc = storedEvents.first.begin();
-    std::vector<double>::iterator itr_oldts = storedEvents.second.begin();
-
     if(nADC> 0){
-        //Erase old data by iterating through and seeing how current
-        //  the timestamp is relative to the new data:
-        while(itr_oldadc < storedEvents.first.end() && ts_sec[nADC-1] - *itr_oldts > dataLength){
+        //Erase old data by iterating through and seeing how old the stored data is relative to the new data:
+        //If the data entry is more than dataLength older than dataLength, delete it.
+        while(storedEvents.first.size()>0 && ts_sec[nADC-1] - *storedEvents.second.begin() > dataLength){
             storedEvents.first.erase(storedEvents.first.begin());
             storedEvents.second.erase(storedEvents.second.begin());
-            itr_oldadc++;
-            itr_oldts++;
         }
 
         //Write new raw data to file and then store it:
         std::fstream outfile(filename,std::ios::app);
-        std::fstream dsafdsafds(filename,std::ios::app);
         for(int i = 0; i < nADC; i++){
             outfile<< ADC[i]<<'\t'<<std::setprecision(25)<<ts_sec[i]<<'\n';
             storedEvents.first.push_back(ADC[i]);
             storedEvents.second.push_back(ts_sec[i]);
         }
+
         outfile.close();
     }
     std::cout<<"Finished analysis sequence."<<std::endl;
