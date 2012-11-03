@@ -157,7 +157,7 @@ int LynxDAQ::AcquireData(int n) {
 
     if(simMode){
         //We will generate a numData amount of random data points.
-        int numData = ceil((double)rand()/RAND_MAX*10);
+        int numData = ceil((double)rand()/RAND_MAX*5);
         vector<double> ADC;
         vector<double> ts_sec;
         vector<qint64> ts;
@@ -179,7 +179,7 @@ int LynxDAQ::AcquireData(int n) {
 
         PostData<double>(ADC.size(), "ADCOutput",&ADC[0],&ts[0]);
         PostData<double>(ADC.size(), "TS",&ts_sec[0],&ts[0]);
-        cout<<"Posting data..."<<endl;
+        cout<<"Posting simulated data..."<<endl;
 
         return 0;
     }
@@ -238,7 +238,7 @@ int LynxDAQ::AcquireData(int n) {
     PostData<double>(ADC.size(), "ADCOutput",&ADC[0],&ts[0]);
     PostData<double>(ADC.size(), "TS",&ts_sec[0],&ts[0]);
 
-    //Update the real/live times - this is important for checking if the systme is in acquisition.
+    //Update the real/live times - this is important for checking if the system is in acquisition.
     currRealTime = RealTime();
     currLiveTime = LiveTime();
     return 0;

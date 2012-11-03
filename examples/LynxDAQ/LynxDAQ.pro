@@ -34,17 +34,13 @@ SOURCES += \
     src/main.cpp \
     src/LynxDAQ.cpp \
     src/SIMAnalysisThread.cpp \
-    src/ActivityCounter.cpp \
-    src/DAQControlWidget.cpp \
-    src/AnalysisWidget.cpp
+    src/DAQControlWidget.cpp
 
 HEADERS += \
     include/LynxDAQ.h \
     include/SIMAnalysisThread.h \
-    include/ActivityCounter.h \
     include/DAQControlWidget.h \
-    include/utilities.h \
-    include/AnalysisWidget.h
+    include/utilities.h
 
 ##
 # Please fill in GRIFDIR and ROOTDIR with the appropriate paths

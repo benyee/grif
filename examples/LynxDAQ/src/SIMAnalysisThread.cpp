@@ -29,10 +29,11 @@
 SIMAnalysisThread::SIMAnalysisThread(double x, std::string s) {
     dataLength = x;
     setFileName(s);
+    isPlotting = false;
 
     CreateNewHistogram("Histogram",8192,0.0,8192.0);
-    GetHistogram("Histogram")->set_rate_mode(true);
-    GetHistogram("Histogram")->set_packet_scale_factor(0.01);
+    GetHistogram("Histogram")->set_rate_mode(false);
+    //GetHistogram("Histogram")->set_packet_scale_factor(0.01);
 }
 
 SIMAnalysisThread::~SIMAnalysisThread() {
@@ -43,19 +44,22 @@ void SIMAnalysisThread::setBinning(int nBins, double xMax){
 }
 
 int SIMAnalysisThread::Analyze() {
+    std::cout<<"Starting Analysis Sequence...";
+
     double* ADC; //bin number or energy
     double* ts_sec; //timestamp in seconds
     int nADC;
 
-    QPair<int, double*> pADC = ReadData<double>("LynxDAQ","ADCOutput");
-    ADC = pADC.second; nADC = pADC.first;
 
-    if(isPlotting){
+    QPair<int, double*> pADC = ReadData<double>("LynxDAQ","ADCOutput");
+    QPair<int, double*> pTS = ReadData<double>("LynxDAQ","TS");
+    ADC = pADC.second; nADC = pADC.first;
+    ts_sec = pTS.second;
+
+    if(isPlotting && nADC > 0){
         UpdateHistogram("Histogram",ADC,nADC);
     }
 
-    QPair<int, double*> pTS = ReadData<double>("LynxDAQ","TS");
-    ts_sec = pTS.second;
 
     if(nADC> 0){
         //Erase old data by iterating through and seeing how old the stored data is relative to the new data:

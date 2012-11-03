@@ -257,6 +257,9 @@ void DAQControlWidget::StartStopAcq(){
             return;
         }
 
+        //ClearHist();
+        if(hist_status){ToggleHist();}
+
         //Otherwise, the regulator has started.
         daq_thread_->StopCollection();
 
@@ -264,9 +267,6 @@ void DAQControlWidget::StartStopAcq(){
         GRISleep::msleep(2500); //Wait until the appropriate threads have stopped.
         ui_->daqstartstop->setEnabled(true);
 
-        if(hist_status){
-            ToggleHist();
-        }
     }
     else if(!reg_started_) { //if the regulators haven't been started (this is the first time you've hit start/stop)
         //Send file name/reference time and prevent further file name changes:
@@ -277,7 +277,7 @@ void DAQControlWidget::StartStopAcq(){
 
         //Display the acquisition start time:
         ui_->startTime->setText("Start Time: " +QDateTime::currentDateTime().toString("dd.MMM.yyyy hh:mm:ss.zzz"));
-        ui_->startTime->setText("End Time: ???");
+        ui_->endTime->setText("End Time: ???");
 
         ui_->daqstartstop->setEnabled(false); //Disable button until it starts up
         reg->Start(); //Start the regulators.
@@ -300,7 +300,7 @@ void DAQControlWidget::StartStopAcq(){
         ui_ ->refTime->setEnabled(false);
 
         //Display the new acquisition start time:
-        ui_->startTime->setText(QDateTime::currentDateTime().toString("dd.MMM.yyyy hh:mm:ss.zzz"));
+        ui_->startTime->setText("Start Time: " + QDateTime::currentDateTime().toString("dd.MMM.yyyy hh:mm:ss.zzz"));
 
 
         //Record the action in the log file:
@@ -317,6 +317,7 @@ void DAQControlWidget::StartStopAcq(){
 
 void DAQControlWidget::ToggleHist(){
     if(daq_status_!=kDAQStatusStarted){
+        std::cout<<hist_status<<endl;
         return;
     }
     if(hist_status){
