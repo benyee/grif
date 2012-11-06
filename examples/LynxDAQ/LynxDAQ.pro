@@ -106,7 +106,6 @@ LIBS+="C:/Program Files/Microsoft SDKs/Windows/v7.0A/Lib/WS2_32.lib"
 LIBS+="C:/Program Files/Microsoft SDKs/Windows/v7.0A/Lib/IPHlpApi.lib"
 
 FORMS += \
-    src/DAQControlWidget.ui \
-    src/AnalysisWidget.ui
+    src/DAQControlWidget.ui
 
 

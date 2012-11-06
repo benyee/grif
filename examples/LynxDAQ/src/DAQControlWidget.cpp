@@ -39,14 +39,21 @@ DAQControlWidget::DAQControlWidget(QWidget *parent, LynxDAQ *daq, SIMAnalysisThr
   hv_enable_timer_->setInterval(500);
   DisableHVControl();
 
+  //Initialize Histogram status boxes:
+  QPalette palette;
+  palette = ui_->histbox1->palette();
+  palette.setColor(ui_->histbox1->backgroundRole(),Qt::yellow);
+  ui_->histbox1->setPalette(palette);
+  hist_status1 = false;
+
+  palette = ui_->histbox2->palette();
+  palette.setColor(ui_->histbox2->backgroundRole(),Qt::yellow);
+  ui_->histbox2->setPalette(palette);
+  hist_status2 = false;
+
   //Update the page to make sure everything's good to go:
   Update();
 
-  QPalette palette;
-  palette = ui_->histbox->palette();
-  palette.setColor(ui_->histbox->backgroundRole(),Qt::yellow);
-  ui_->histbox->setPalette(palette);
-  hist_status = false;
 
   //start the signal and slot pairs...
   connect(update_timer_, SIGNAL(timeout()), this, SLOT(Update()));
@@ -61,8 +68,15 @@ DAQControlWidget::DAQControlWidget(QWidget *parent, LynxDAQ *daq, SIMAnalysisThr
   connect(ui_->daqconnect,SIGNAL(clicked()),this,SLOT(Connect()));
   connect(ui_->daqstartstop,SIGNAL(clicked()),this,SLOT(StartStopAcq()));
 
-  connect(ui_->histOnOff,SIGNAL(clicked()),this,SLOT(ToggleHist()));
-  connect(ui_->histClear,SIGNAL(clicked()),this,SLOT(ClearHist()));
+  connect(ui_->histOnOff1,SIGNAL(clicked()),this,SLOT(ToggleHist1()));
+  connect(ui_->histClear1,SIGNAL(clicked()),this,SLOT(ClearHist1()));
+  connect(ui_->histOnOff2,SIGNAL(clicked()),this,SLOT(ToggleHist2()));
+  connect(ui_->histClear2,SIGNAL(clicked()),this,SLOT(ClearHist2()));
+
+  connect(ui_->packetValue1,SIGNAL(editingFinished()),this,SLOT(UpdateHistRate1()));
+  connect(ui_->packetValue2,SIGNAL(editingFinished()),this,SLOT(UpdateHistRate2()));
+
+
 }
 
 
@@ -257,8 +271,8 @@ void DAQControlWidget::StartStopAcq(){
             return;
         }
 
-        //ClearHist();
-        if(hist_status){ToggleHist();}
+        if(hist_status1){ToggleHist1();}
+        if(hist_status2){ToggleHist2();}
 
         //Otherwise, the regulator has started.
         daq_thread_->StopCollection();
@@ -315,43 +329,90 @@ void DAQControlWidget::StartStopAcq(){
     ui_->daqstartstop->setEnabled(true);
 }
 
-void DAQControlWidget::ToggleHist(){
+void DAQControlWidget::ToggleHist1(){
     if(daq_status_!=kDAQStatusStarted){
-        std::cout<<hist_status<<endl;
+        //std::cout<<hist_status<<endl;
         return;
     }
-    if(hist_status){
-        hist_status = false;
+    if(hist_status1){
+        hist_status1 = false;
         QPalette palette;
-        palette = ui_->histbox->palette();
-        palette.setColor(ui_->histbox->backgroundRole(),Qt::yellow);
-        ui_->histbox->setPalette(palette);
-        ui_->histstatus->setText("Status: Not Plotting");
-        an_thread_->setPlotStatus(false);
-        ui_->histEnd->setText("End Time: " +QDateTime::currentDateTime().toString("dd.MMM.yyyy hh:mm:ss.zzz"));
+        palette = ui_->histbox1->palette();
+        palette.setColor(ui_->histbox1->backgroundRole(),Qt::yellow);
+        ui_->histbox1->setPalette(palette);
+        ui_->histStatus1->setText("Status: Not Plotting");
+        an_thread_->setPlotStatus(false,2);
+        ui_->histEnd1->setText("End Time: " +QDateTime::currentDateTime().toString("dd.MMM.yyyy hh:mm:ss.zzz"));
 
     }else{
-        hist_status = true;
+        hist_status1 = true;
         QPalette palette;
-        palette = ui_->histbox->palette();
-        palette.setColor(ui_->histbox->backgroundRole(),Qt::green);
-        ui_->histbox->setPalette(palette);
-        ui_->histstatus->setText("Status: Plotting!");
-        an_thread_->setPlotStatus(true);
-        ui_->histStart->setText("Start Time: " +QDateTime::currentDateTime().toString("dd.MMM.yyyy hh:mm:ss.zzz"));
-        ui_->histEnd->setText("End Time: ???");
+        palette = ui_->histbox1->palette();
+        palette.setColor(ui_->histbox1->backgroundRole(),Qt::green);
+        ui_->histbox1->setPalette(palette);
+        ui_->histStatus1->setText("Status: Plotting!");
+        an_thread_->setPlotStatus(true,1);
+        ui_->histStart1->setText("Start Time: " +QDateTime::currentDateTime().toString("dd.MMM.yyyy hh:mm:ss.zzz"));
+        ui_->histEnd1->setText("End Time: ???");
     }
 }
 
-void DAQControlWidget::ClearHist(){
-    an_thread_->ClearHistogram("Histogram");
-    ui_->histEnd->setText("End Time: ???");
-    if(hist_status){
-        ui_->histStart->setText("Start Time: " +QDateTime::currentDateTime().toString("dd.MMM.yyyy hh:mm:ss.zzz"));
-     }else{
-        ui_->histStart->setText("Start Time: ???");
+
+void DAQControlWidget::ToggleHist2(){
+    if(daq_status_!=kDAQStatusStarted){
+        //std::cout<<hist_status<<endl;
+        return;
+    }
+    if(hist_status2){
+        hist_status2 = false;
+        QPalette palette;
+        palette = ui_->histbox2->palette();
+        palette.setColor(ui_->histbox2->backgroundRole(),Qt::yellow);
+        ui_->histbox2->setPalette(palette);
+        ui_->histStatus2->setText("Status: Not Plotting");
+        an_thread_->setPlotStatus(false,2);
+        ui_->histEnd2->setText("End Time: " +QDateTime::currentDateTime().toString("dd.MMM.yyyy hh:mm:ss.zzz"));
+
+    }else{
+        hist_status2 = true;
+        QPalette palette;
+        palette = ui_->histbox2->palette();
+        palette.setColor(ui_->histbox2->backgroundRole(),Qt::green);
+        ui_->histbox2->setPalette(palette);
+        ui_->histStatus2->setText("Status: Plotting!");
+        an_thread_->setPlotStatus(true,2);
+        ui_->histStart2->setText("Start Time: " +QDateTime::currentDateTime().toString("dd.MMM.yyyy hh:mm:ss.zzz"));
+        ui_->histEnd2->setText("End Time: ???");
     }
 }
+
+void DAQControlWidget::ClearHist1(){
+    an_thread_->ClearHistogram("Histogram1");
+    ui_->histEnd1->setText("End Time: ???");
+    if(hist_status1){
+        ui_->histStart1->setText("Start Time: " +QDateTime::currentDateTime().toString("dd.MMM.yyyy hh:mm:ss.zzz"));
+     }else{
+        ui_->histStart1->setText("Start Time: ???");
+    }
+}
+
+void DAQControlWidget::ClearHist2(){
+    an_thread_->ClearHistogram("Histogram2");
+    ui_->histEnd2->setText("End Time: ???");
+    if(hist_status2){
+        ui_->histStart2->setText("Start Time: " +QDateTime::currentDateTime().toString("dd.MMM.yyyy hh:mm:ss.zzz"));
+     }else{
+        ui_->histStart2->setText("Start Time: ???");
+    }
+}
+
+void DAQControlWidget::UpdateHistRate1(){
+    an_thread_->setHistRate(ui_->packetValue1->value(),1);
+}
+void DAQControlWidget::UpdateHistRate2(){
+    an_thread_->setHistRate(ui_->packetValue2->value(),2);
+}
+
 
 void DAQControlWidget::ToggleSim(){
     bool simStatus = daq_thread_->isSimMode();

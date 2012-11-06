@@ -49,7 +49,8 @@ private:
     bool hv_enabled_;
     QTimer* hv_enable_timer_; /// timer for HV enable
 
-    bool hist_status;
+    bool hist_status1;
+    bool hist_status2;
 
 signals:
 
@@ -62,8 +63,13 @@ private slots:
     void StartStopAcq();  //Deals with what happens when you press the Start/Stop button
     void Connect();
     void ToggleSim();
-    void ToggleHist();
-    void ClearHist();
+    void ToggleHist1();
+    void ClearHist1();
+    void ToggleHist2();
+    void ClearHist2();
+    void UpdateHistRate1();
+    void UpdateHistRate2();
+
 };
 
 #endif // GRIF_UI_DAQCONTROLWIDGET_H_

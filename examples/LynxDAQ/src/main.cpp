@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
     QMainWindow *win1 = new QMainWindow();
     GRIHist1DWidget *histDraw1 = new GRIHist1DWidget(win1);
     win1->setCentralWidget(histDraw1);
-    histDraw1->set_hist(AMC1->GetHistogram("Histogram"));
+    histDraw1->set_hist(AMC1->GetHistogram("Histogram1"));
     histDraw1->Initialize();
     histDraw1->set_foreground_color(Qt::cyan);
     histDraw1->set_background_color(Qt::darkBlue);
@@ -57,6 +57,19 @@ int main(int argc, char* argv[])
     histDraw1->set_ylabel("Counts");
     win1->resize(450,300);
     win1->show();
+
+    QMainWindow *win2 = new QMainWindow();
+    GRIHist1DWidget *histDraw2 = new GRIHist1DWidget(win2);
+    win2->setCentralWidget(histDraw2);
+    histDraw2->set_hist(AMC1->GetHistogram("Histogram2"));
+    histDraw2->Initialize();
+    histDraw2->set_foreground_color(Qt::cyan);
+    histDraw2->set_background_color(Qt::darkBlue);
+    histDraw2->set_outline_color(Qt::cyan);
+    histDraw2->set_xlabel("Channel");
+    histDraw2->set_ylabel("Counts");
+    win2->resize(450,300);
+    win2->show();
 
     //Ignore for now:
 //    AnalysisWidget* analysisGUI = new AnalysisWidget(0,lynx,AMC1,reg);

@@ -43,8 +43,9 @@ class SIMAnalysisThread : public GRIAnalysisThread {
     std::string getFileName(){return filename;}
     double getDataLength(){return dataLength;}
     void setDataLength(double x){dataLength = x;}
-    void setPlotStatus(bool x){isPlotting = x;}
-    bool getPlotStatus(){return isPlotting;}
+    void setPlotStatus(bool x,int histNum){if(histNum==1){isPlotting1 = x;} else{isPlotting2=x;}}
+    bool getPlotStatus(int histNum){if(histNum==1){return isPlotting1;}return isPlotting2;}
+    void setHistRate(double rate, int histNum);
 
  private:
     QPair<std::vector<double>,std::vector<double> > storedEvents;
@@ -57,7 +58,8 @@ class SIMAnalysisThread : public GRIAnalysisThread {
 
     std::string filename;  //File name for raw data output.
 
-    bool isPlotting;
+    bool isPlotting1;
+    bool isPlotting2;
 };
 
 #endif  // GRIF_EXAMPLES_SIMULATOR_SIMANALYSISTHREAD_H_

@@ -35,6 +35,8 @@ GRIDAQBaseAccumNode* LynxDAQ::RegisterDataOutput(QString outName) {
 int LynxDAQ::ConnectToDAQ(){//Open a connection to the device
     if(simMode){
         isConnected = true;
+        currLiveTime = LiveTime();
+        currRealTime = RealTime();
         return 0;
     }
 
@@ -155,9 +157,9 @@ int LynxDAQ::AcquireData(int n) {
     cout<<"Acquiring Data..."<<endl;
 
 
-    if(simMode){
+    if(simMode && isSimulating){
         //We will generate a numData amount of random data points.
-        int numData = ceil((double)rand()/RAND_MAX*5);
+        int numData = ceil((double)rand()/RAND_MAX*15);
         vector<double> ADC;
         vector<double> ts_sec;
         vector<qint64> ts;
@@ -167,12 +169,12 @@ int LynxDAQ::AcquireData(int n) {
             //Generate a random event, with a timestamp a random time ahead of the previous one
             ADC.push_back(ceil((double)rand()/RAND_MAX*8192));
             if(i == 0){
-                Time = ceil((double)rand()/RAND_MAX*1e6)+simModeTime;
+                Time = 43543+simModeTime;//ceil((double)rand()/RAND_MAX*1e6)+simModeTime;
             }else{
-                Time = ceil((double)rand()/RAND_MAX*1e6)+Time;
+                Time = 34544+simModeTime;//ceil((double)rand()/RAND_MAX*1e6)+Time;
             }
             ts.push_back(Time);
-            ts_sec.push_back((double)Time/1e6+(double)dt/1000);
+            ts_sec.push_back(floor((double)Time/1e6+(double)dt/1000));
         }
 
         simModeTime = Time;
@@ -181,6 +183,8 @@ int LynxDAQ::AcquireData(int n) {
         PostData<double>(ADC.size(), "TS",&ts_sec[0],&ts[0]);
         cout<<"Posting simulated data..."<<endl;
 
+        return 0;
+    }else if(simMode){
         return 0;
     }
     //Get the list data from lynx

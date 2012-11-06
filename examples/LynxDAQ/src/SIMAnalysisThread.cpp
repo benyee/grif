@@ -29,11 +29,15 @@
 SIMAnalysisThread::SIMAnalysisThread(double x, std::string s) {
     dataLength = x;
     setFileName(s);
-    isPlotting = false;
+    isPlotting1 = false;
+    isPlotting2 = false;
 
-    CreateNewHistogram("Histogram",8192,0.0,8192.0);
-    GetHistogram("Histogram")->set_rate_mode(false);
-    //GetHistogram("Histogram")->set_packet_scale_factor(0.01);
+    CreateNewHistogram("Histogram1",8192,0.0,8192.0);
+    GetHistogram("Histogram1")->set_rate_mode(false);
+    GetHistogram("Histogram1")->set_packet_scale_factor(1);
+    CreateNewHistogram("Histogram2",8192,0.0,8192.0);
+    GetHistogram("Histogram2")->set_rate_mode(false);
+    GetHistogram("Histogram2")->set_packet_scale_factor(0.5);
 }
 
 SIMAnalysisThread::~SIMAnalysisThread() {
@@ -54,10 +58,14 @@ int SIMAnalysisThread::Analyze() {
     QPair<int, double*> pADC = ReadData<double>("LynxDAQ","ADCOutput");
     QPair<int, double*> pTS = ReadData<double>("LynxDAQ","TS");
     ADC = pADC.second; nADC = pADC.first;
+    //std::cout<<nADC<<std::endl;
     ts_sec = pTS.second;
 
-    if(isPlotting && nADC > 0){
-        UpdateHistogram("Histogram",ADC,nADC);
+    if(isPlotting1 && nADC > 0){
+        UpdateHistogram("Histogram1",ADC,nADC);
+    }
+    if(isPlotting2 && nADC > 0){
+        UpdateHistogram("Histogram2",ADC,nADC);
     }
 
 
@@ -91,4 +99,9 @@ void SIMAnalysisThread::setFileName(std::string s,bool timestamp, std::string ex
     }
     else{filename = s + ext;}
 
+}
+
+void SIMAnalysisThread::setHistRate(double rate, int histNum){
+    if(histNum==1){GetHistogram("Histogram1")->set_packet_scale_factor(rate);}
+    else{GetHistogram("Histogram2")->set_packet_scale_factor(rate);}
 }

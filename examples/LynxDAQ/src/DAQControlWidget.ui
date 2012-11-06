@@ -114,111 +114,6 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QGroupBox" name="groupBox">
-     <property name="autoFillBackground">
-      <bool>true</bool>
-     </property>
-     <property name="title">
-      <string>Information</string>
-     </property>
-     <widget class="QLabel" name="startTime">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>20</y>
-        <width>231</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Started:  ???</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="realTime">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>80</y>
-        <width>171</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Real Time:  0 (s)</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="liveTime">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>60</y>
-        <width>171</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Live Time:   0 (s)</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="countRate">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>100</y>
-        <width>161</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Current Count Rate: 0 (Hz)</string>
-      </property>
-     </widget>
-     <widget class="QTextEdit" name="outFileName">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>150</y>
-        <width>151</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="html">
-       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;out&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="fileNameInstruction">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>130</y>
-        <width>161</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Output File Name: (no extension)</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="endTime">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>40</y>
-        <width>231</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>End time: ???</string>
-      </property>
-     </widget>
-    </widget>
-   </item>
    <item row="2" column="1">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="autoFillBackground">
@@ -290,10 +185,40 @@ p, li { white-space: pre-wrap; }
        <string>Logger File Name: (no extension)</string>
       </property>
      </widget>
+     <widget class="QTextEdit" name="outFileName">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>150</y>
+        <width>151</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="html">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;out&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="fileNameInstruction">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>120</y>
+        <width>161</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Output File Name: (no extension)</string>
+      </property>
+     </widget>
     </widget>
    </item>
    <item row="3" column="0">
-    <widget class="QGroupBox" name="histbox">
+    <widget class="QGroupBox" name="histbox1">
      <property name="enabled">
       <bool>true</bool>
      </property>
@@ -301,26 +226,13 @@ p, li { white-space: pre-wrap; }
       <bool>true</bool>
      </property>
      <property name="title">
-      <string>Histogram Control</string>
+      <string>Histogram 1 Control</string>
      </property>
-     <widget class="QPushButton" name="histOnOff">
+     <widget class="QLabel" name="histStatus1">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>20</y>
-        <width>111</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Histogram ON/OFF</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="histstatus">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>40</y>
+        <y>80</y>
         <width>111</width>
         <height>30</height>
        </rect>
@@ -329,11 +241,11 @@ p, li { white-space: pre-wrap; }
        <string>Status: Not Plotting</string>
       </property>
      </widget>
-     <widget class="QLabel" name="histStart">
+     <widget class="QLabel" name="histStart1">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>70</y>
+        <y>110</y>
         <width>231</width>
         <height>16</height>
        </rect>
@@ -342,11 +254,11 @@ p, li { white-space: pre-wrap; }
        <string>Start Time:  ???</string>
       </property>
      </widget>
-     <widget class="QLabel" name="histEnd">
+     <widget class="QLabel" name="histEnd1">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>90</y>
+        <y>130</y>
         <width>231</width>
         <height>16</height>
        </rect>
@@ -355,7 +267,7 @@ p, li { white-space: pre-wrap; }
        <string>End Time: ???</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="histClear">
+     <widget class="QPushButton" name="histClear1">
       <property name="geometry">
        <rect>
         <x>130</x>
@@ -365,7 +277,286 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="text">
-       <string>Clear Histogram</string>
+       <string>Clear Histogram 1</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="histOnOff1">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>111</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Histogram 1 Off</string>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="packetValue1">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>50</y>
+        <width>62</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="decimals">
+       <number>3</number>
+      </property>
+      <property name="maximum">
+       <double>1.000000000000000</double>
+      </property>
+      <property name="value">
+       <double>1.000000000000000</double>
+      </property>
+     </widget>
+     <widget class="QLabel" name="packetInfo1">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>50</y>
+        <width>171</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Packet Scale Factor (btwn 0 &amp; 1)</string>
+      </property>
+     </widget>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QGroupBox" name="histbox2">
+     <property name="autoFillBackground">
+      <bool>true</bool>
+     </property>
+     <property name="title">
+      <string>Histogram 2 Control</string>
+     </property>
+     <widget class="QPushButton" name="histClear2">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>20</y>
+        <width>111</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Clear Histogram 2</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="histStatus2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>80</y>
+        <width>111</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Status: Not Plotting</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="histStart2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>110</y>
+        <width>231</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Start Time:  ???</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="histEnd2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>130</y>
+        <width>231</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>End Time: ???</string>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="packetValue2">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>50</y>
+        <width>62</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="decimals">
+       <number>3</number>
+      </property>
+      <property name="maximum">
+       <double>1.000000000000000</double>
+      </property>
+      <property name="value">
+       <double>0.500000000000000</double>
+      </property>
+     </widget>
+     <widget class="QLabel" name="packetInfo2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>50</y>
+        <width>171</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Packet Scale Factor (btwn 0 &amp; 1)</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="histOnOff2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>111</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Histogram 1 Off</string>
+      </property>
+     </widget>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="autoFillBackground">
+      <bool>true</bool>
+     </property>
+     <property name="title">
+      <string>Information</string>
+     </property>
+     <widget class="QLabel" name="startTime">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>231</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Started:  ???</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="realTime">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>80</y>
+        <width>171</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Real Time:  0 (s)</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="liveTime">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>60</y>
+        <width>171</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Live Time:   0 (s)</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="countRate">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>100</y>
+        <width>161</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Current Count Rate: 0 (Hz)</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="endTime">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>231</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>End time: ???</string>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="roi_L">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>150</y>
+        <width>61</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>150</y>
+        <width>62</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <double>100000.000000000000000</double>
+      </property>
+      <property name="value">
+       <double>8192.000000000000000</double>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>150</y>
+        <width>46</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>ROI L:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>150</y>
+        <width>46</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>ROI R:</string>
       </property>
      </widget>
     </widget>
