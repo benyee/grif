@@ -309,7 +309,7 @@ p, li { white-space: pre-wrap; }
        <double>1.000000000000000</double>
       </property>
       <property name="value">
-       <double>0.990000000000000</double>
+       <double>0.001000000000000</double>
       </property>
      </widget>
      <widget class="QLabel" name="packetInfo1">
@@ -416,7 +416,7 @@ p, li { white-space: pre-wrap; }
        <double>1.000000000000000</double>
       </property>
       <property name="value">
-       <double>0.500000000000000</double>
+       <double>0.010000000000000</double>
       </property>
      </widget>
      <widget class="QLabel" name="packetInfo2">
