@@ -46,6 +46,7 @@ class SIMAnalysisThread : public GRIAnalysisThread {
     void setPlotStatus(bool x,int histNum){if(histNum==1){isPlotting1 = x;} else{isPlotting2=x;}}
     bool getPlotStatus(int histNum){if(histNum==1){return isPlotting1;}return isPlotting2;}
     void setHistRate(double rate, int histNum);
+    void setHistMode(bool x, int histNum);
 
  private:
     QPair<std::vector<double>,std::vector<double> > storedEvents;

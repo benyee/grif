@@ -69,6 +69,8 @@ private slots:
     void ClearHist2();
     void UpdateHistRate1();
     void UpdateHistRate2();
+    void ToggleRateMode1();
+    void ToggleRateMode2();
 
 };
 

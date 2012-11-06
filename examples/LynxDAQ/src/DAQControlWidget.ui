@@ -232,7 +232,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>80</y>
+        <y>100</y>
         <width>111</width>
         <height>30</height>
        </rect>
@@ -245,7 +245,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>110</y>
+        <y>130</y>
         <width>231</width>
         <height>16</height>
        </rect>
@@ -258,7 +258,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>130</y>
+        <y>150</y>
         <width>231</width>
         <height>16</height>
        </rect>
@@ -290,14 +290,14 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="text">
-       <string>Histogram 1 Off</string>
+       <string>Histogram 1 On/ Off</string>
       </property>
      </widget>
      <widget class="QDoubleSpinBox" name="packetValue1">
       <property name="geometry">
        <rect>
         <x>180</x>
-        <y>50</y>
+        <y>80</y>
         <width>62</width>
         <height>22</height>
        </rect>
@@ -309,20 +309,33 @@ p, li { white-space: pre-wrap; }
        <double>1.000000000000000</double>
       </property>
       <property name="value">
-       <double>1.000000000000000</double>
+       <double>0.990000000000000</double>
       </property>
      </widget>
      <widget class="QLabel" name="packetInfo1">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>50</y>
+        <y>80</y>
         <width>171</width>
         <height>21</height>
        </rect>
       </property>
       <property name="text">
        <string>Packet Scale Factor (btwn 0 &amp; 1)</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="rateMode1">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>50</y>
+        <width>70</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Rate Mode</string>
       </property>
      </widget>
     </widget>
@@ -352,7 +365,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>80</y>
+        <y>100</y>
         <width>111</width>
         <height>30</height>
        </rect>
@@ -365,7 +378,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>110</y>
+        <y>130</y>
         <width>231</width>
         <height>16</height>
        </rect>
@@ -378,7 +391,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>130</y>
+        <y>150</y>
         <width>231</width>
         <height>16</height>
        </rect>
@@ -391,7 +404,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>180</x>
-        <y>50</y>
+        <y>80</y>
         <width>62</width>
         <height>22</height>
        </rect>
@@ -410,7 +423,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>50</y>
+        <y>80</y>
         <width>171</width>
         <height>21</height>
        </rect>
@@ -429,7 +442,23 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="text">
-       <string>Histogram 1 Off</string>
+       <string>Histogram 2 On/Off</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="rateMode2">
+      <property name="geometry">
+       <rect>
+        <x>19</x>
+        <y>50</y>
+        <width>71</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Rate Mode</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
       </property>
      </widget>
     </widget>

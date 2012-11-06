@@ -51,6 +51,12 @@ DAQControlWidget::DAQControlWidget(QWidget *parent, LynxDAQ *daq, SIMAnalysisThr
   ui_->histbox2->setPalette(palette);
   hist_status2 = false;
 
+  //Ensure histogram attributes match default values:
+  UpdateHistRate1();
+  UpdateHistRate2();
+  ToggleRateMode1();
+  ToggleRateMode2();
+
   //Update the page to make sure everything's good to go:
   Update();
 
@@ -73,8 +79,11 @@ DAQControlWidget::DAQControlWidget(QWidget *parent, LynxDAQ *daq, SIMAnalysisThr
   connect(ui_->histOnOff2,SIGNAL(clicked()),this,SLOT(ToggleHist2()));
   connect(ui_->histClear2,SIGNAL(clicked()),this,SLOT(ClearHist2()));
 
-  connect(ui_->packetValue1,SIGNAL(editingFinished()),this,SLOT(UpdateHistRate1()));
-  connect(ui_->packetValue2,SIGNAL(editingFinished()),this,SLOT(UpdateHistRate2()));
+  connect(ui_->packetValue1,SIGNAL(valueChanged(double)),this,SLOT(UpdateHistRate1()));
+  connect(ui_->packetValue2,SIGNAL(valueChanged(double)),this,SLOT(UpdateHistRate2()));
+
+  connect(ui_->rateMode1,SIGNAL(clicked()),this,SLOT(ToggleRateMode1()));
+  connect(ui_->rateMode2,SIGNAL(clicked()),this,SLOT(ToggleRateMode2()));
 
 
 }
@@ -213,6 +222,7 @@ void DAQControlWidget::Update() {
       ui_->liveTime->setText(QString("Live Time: ") + live + ' s');
       ui_->realTime->setText(QString("Real Time: ") + real + ' s');
   }
+
 }
 
 
@@ -341,7 +351,7 @@ void DAQControlWidget::ToggleHist1(){
         palette.setColor(ui_->histbox1->backgroundRole(),Qt::yellow);
         ui_->histbox1->setPalette(palette);
         ui_->histStatus1->setText("Status: Not Plotting");
-        an_thread_->setPlotStatus(false,2);
+        an_thread_->setPlotStatus(false,1);
         ui_->histEnd1->setText("End Time: " +QDateTime::currentDateTime().toString("dd.MMM.yyyy hh:mm:ss.zzz"));
 
     }else{
@@ -412,6 +422,20 @@ void DAQControlWidget::UpdateHistRate1(){
 void DAQControlWidget::UpdateHistRate2(){
     an_thread_->setHistRate(ui_->packetValue2->value(),2);
 }
+
+void DAQControlWidget::ToggleRateMode1(){
+    an_thread_->setHistMode(ui_->rateMode1->isChecked(),1);
+    if(ui_->rateMode1->isChecked()){
+        ui_->packetValue1->setEnabled(true);
+    }else{ui_->packetValue1->setEnabled(false);}
+}
+void DAQControlWidget::ToggleRateMode2(){
+    an_thread_->setHistMode(ui_->rateMode2->isChecked(),2);
+    if(ui_->rateMode2->isChecked()){
+        ui_->packetValue2->setEnabled(true);
+    }else{ui_->packetValue2->setEnabled(false);}
+}
+
 
 
 void DAQControlWidget::ToggleSim(){
