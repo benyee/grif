@@ -171,10 +171,10 @@ int LynxDAQ::AcquireData(int n) {
             if(i == 0){
                 Time = 43543+simModeTime;//ceil((double)rand()/RAND_MAX*1e6)+simModeTime;
             }else{
-                Time = 34544+simModeTime;//ceil((double)rand()/RAND_MAX*1e6)+Time;
+                Time = 34534+simModeTime;//ceil((double)rand()/RAND_MAX*1e6)+Time;
             }
             ts.push_back(Time);
-            ts_sec.push_back(floor((double)Time/1e6+(double)dt/1000));
+            ts_sec.push_back((double)Time/1e6+(double)dt/1000);
         }
 
         simModeTime = Time;
@@ -245,6 +245,7 @@ int LynxDAQ::AcquireData(int n) {
     //Update the real/live times - this is important for checking if the system is in acquisition.
     currRealTime = RealTime();
     currLiveTime = LiveTime();
+
     return 0;
 }
 
