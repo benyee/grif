@@ -84,7 +84,6 @@ int SIMAnalysisThread::Analyze() {
             storedEvents.first.push_back(ADC[i]);
             storedEvents.second.push_back(ts_sec[i]);
         }
-
         outfile.close();
     }
     std::cout<<"Finished analysis sequence."<<std::endl;

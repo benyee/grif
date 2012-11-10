@@ -159,11 +159,11 @@ int LynxDAQ::AcquireData(int n) {
 
     if(simMode && isSimulating){
         //We will generate a numData amount of random data points.
-        int numData = ceil((double)rand()/RAND_MAX*15);
+        int numData = floor((double)rand()/RAND_MAX*8);
         vector<double> ADC;
         vector<double> ts_sec;
         vector<qint64> ts;
-        qint64 Time;
+        qint64 Time = 0;
 
         for(int i = 0; i<numData;i++){
             //Generate a random event, with a timestamp a random time ahead of the previous one
@@ -182,6 +182,7 @@ int LynxDAQ::AcquireData(int n) {
         PostData<double>(ADC.size(), "ADCOutput",&ADC[0],&ts[0]);
         PostData<double>(ADC.size(), "TS",&ts_sec[0],&ts[0]);
         cout<<"Posting simulated data..."<<endl;
+
 
         return 0;
     }else if(simMode){
