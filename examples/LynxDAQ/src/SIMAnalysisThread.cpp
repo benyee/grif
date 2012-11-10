@@ -50,26 +50,24 @@ void SIMAnalysisThread::setBinning(int nBins, double xMax){
 int SIMAnalysisThread::Analyze() {
     std::cout<<"Starting Analysis Sequence...";
 
-    double* ADC; //bin number or energy
-    double* ts_sec; //timestamp in seconds
     int nADC;
-
 
     QPair<int, double*> pADC = ReadData<double>("LynxDAQ","ADCOutput");
     QPair<int, double*> pTS = ReadData<double>("LynxDAQ","TS");
-    ADC = pADC.second; nADC = pADC.first;
-    //std::cout<<nADC<<std::endl;
-    ts_sec = pTS.second;
-
-    if(isPlotting1 && nADC > 0){
-        UpdateHistogram("Histogram1",ADC,nADC);
-    }
-    if(isPlotting2 && nADC > 0){
-        UpdateHistogram("Histogram2",ADC,nADC);
-    }
-
+    nADC = pADC.first;
 
     if(nADC> 0){
+        double* ADC; //bin number or energy
+        double* ts_sec; //timestamp in seconds
+        ADC = pADC.second; ts_sec = pTS.second;
+
+        if(isPlotting1){
+            UpdateHistogram("Histogram1",ADC,nADC);
+        }
+        if(isPlotting2){
+            UpdateHistogram("Histogram2",ADC,nADC);
+        }
+
         //Erase old data by iterating through and seeing how old the stored data is relative to the new data:
         //If the data entry is more than dataLength older than dataLength, delete it.
         while(storedEvents.first.size()>0 && ts_sec[nADC-1] - *storedEvents.second.begin() > dataLength){
@@ -86,6 +84,7 @@ int SIMAnalysisThread::Analyze() {
         }
         outfile.close();
     }
+
     std::cout<<"Finished analysis sequence."<<std::endl;
 
     return 0;
