@@ -21,9 +21,6 @@
 // dhchivers@lbl.gov
 
 #include <QPair>
-#include <iomanip>
-#include <iostream>
-#include <fstream>
 #include "SIMAnalysisThread.h"
 
 SIMAnalysisThread::SIMAnalysisThread(double x, std::string s) {
@@ -31,6 +28,7 @@ SIMAnalysisThread::SIMAnalysisThread(double x, std::string s) {
     setFileName(s);
     isPlotting1 = false;
     isPlotting2 = false;
+    isOutputFileOpen = false;
 
     CreateNewHistogram("Histogram1",8192,0.0,8192.0);
     GetHistogram("Histogram1")->set_rate_mode(true);
@@ -41,6 +39,7 @@ SIMAnalysisThread::SIMAnalysisThread(double x, std::string s) {
 }
 
 SIMAnalysisThread::~SIMAnalysisThread() {
+    closeFile();
 }
 
 void SIMAnalysisThread::setBinning(int nBins, double xMax){
@@ -76,13 +75,11 @@ int SIMAnalysisThread::Analyze() {
         }
 
         //Write new raw data to file and then store it:
-        std::fstream outfile(filename,std::ios::app);
         for(int i = 0; i < nADC; i++){
             outfile<< ADC[i]<<'\t'<<std::setprecision(25)<<ts_sec[i]<<'\n';
             storedEvents.first.push_back(ADC[i]);
             storedEvents.second.push_back(ts_sec[i]);
         }
-        outfile.close();
     }
 
     std::cout<<"Finished analysis sequence."<<std::endl;
@@ -106,5 +103,11 @@ void SIMAnalysisThread::setHistRate(double rate, int histNum){
 void SIMAnalysisThread::setHistMode(bool x, int histNum){
     if(histNum==1){GetHistogram("Histogram1")->set_rate_mode(x);}
     else{GetHistogram("Histogram2")->set_rate_mode(x);}
+}
+
+void SIMAnalysisThread::openFile(){
+    if(isOutputFileOpen){ return;}
+    outfile = std::fstream(filename,std::ios::app);
+    isOutputFileOpen = true;
 }
 

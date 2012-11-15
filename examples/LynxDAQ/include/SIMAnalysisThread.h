@@ -30,6 +30,9 @@
 #include "QFile"
 #include "ActivityCounter.h"
 #include <string>
+#include <iomanip>
+#include <iostream>
+#include <fstream>
 
 class SIMAnalysisThread : public GRIAnalysisThread {
  public:
@@ -48,6 +51,9 @@ class SIMAnalysisThread : public GRIAnalysisThread {
     void setHistRate(double rate, int histNum);
     void setHistMode(bool x, int histNum);
 
+    void openFile();
+    void closeFile(){if(isOutputFileOpen){outfile.close();isOutputFileOpen = false;}}
+
  private:
     QPair<std::vector<double>,std::vector<double> > storedEvents;
     //This Qpair will store all the events of within the last dataLength of acquisition time.
@@ -58,9 +64,10 @@ class SIMAnalysisThread : public GRIAnalysisThread {
     //  Default for LynxDAQ output from the TS ReadData is in seconds.
 
     std::string filename;  //File name for raw data output.
-
+    std::fstream outfile;
     bool isPlotting1;
     bool isPlotting2;
+    bool isOutputFileOpen;
 };
 
 #endif  // GRIF_EXAMPLES_SIMULATOR_SIMANALYSISTHREAD_H_
