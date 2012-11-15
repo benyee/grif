@@ -49,6 +49,8 @@ private:
     bool hv_enabled_;
     QTimer* hv_enable_timer_; /// timer for HV enable
 
+    QTimer* time_timer_;
+
     bool hist_status1;
     bool hist_status2;
 
@@ -60,6 +62,7 @@ private slots:
     void SetHVOn(){daq_thread_->TurnOnHV();}
     void SetHVOff(){daq_thread_->TurnOffHV();}
     void Update();  //Refreshes the GUI, checking for new signals/updates
+    void UpdateTimes();  //Refreshes the real/live times.  We need it to run less often to avoid clogging up the Lynx.
     void StartStopAcq();  //Deals with what happens when you press the Start/Stop button
     void Connect();
     void ToggleSim();

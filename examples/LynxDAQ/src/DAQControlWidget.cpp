@@ -39,6 +39,11 @@ DAQControlWidget::DAQControlWidget(QWidget *parent, LynxDAQ *daq, SIMAnalysisThr
   hv_enable_timer_->setInterval(500);
   DisableHVControl();
 
+  // Timer for updating real/live times:
+  time_timer_ = new QTimer();
+  time_timer_->setInterval(15000);
+  time_timer_->start();
+
   //Initialize Histogram status boxes:
   QPalette palette;
   palette = ui_->histbox1->palette();
@@ -63,6 +68,7 @@ DAQControlWidget::DAQControlWidget(QWidget *parent, LynxDAQ *daq, SIMAnalysisThr
 
   //start the signal and slot pairs...
   connect(update_timer_, SIGNAL(timeout()), this, SLOT(Update()));
+  connect(time_timer_, SIGNAL(timeout()), this, SLOT(UpdateTimes()));
 
   connect(ui_->hvon, SIGNAL(clicked()), this, SLOT(SetHVOn()));
   connect(ui_->hvoff, SIGNAL(clicked()), this, SLOT(SetHVOff()));
@@ -106,6 +112,24 @@ void DAQControlWidget::set_hv_volts_max(double hv_max) {
   }
 }
 
+void DAQControlWidget::UpdateTimes(){
+    //If connected, update the live and real times.
+    if(daq_status_!=kDAQStatusUnknown){
+        QString live,real,dead;
+        if(daq_thread_->LiveTime() < 0){
+            ui_->liveTime->setText(QString("Live Time: ???"));
+            ui_->realTime->setText(QString("Real Time: ???"));
+            ui_->deadTime->setText(QString("Dead Time: "));
+        }else{
+        live.sprintf("%.2f",daq_thread_->LiveTime()/1000000);
+        real.sprintf("%.2f",daq_thread_->RealTime()/1000000);
+        dead.sprintf("%.2f",(daq_thread_->RealTime()-daq_thread_->getLiveTime())/daq_thread_->getRealTime()*100);
+        ui_->liveTime->setText(QString("Live Time: ") + live + ' s');
+        ui_->realTime->setText(QString("Real Time: ") + real + ' s');
+        ui_->deadTime->setText(QString("Dead Time: ") + dead + '%');
+        }
+    }
+}
 
 void DAQControlWidget::Update() {
   QPalette palette;
@@ -213,23 +237,6 @@ void DAQControlWidget::Update() {
   }
   //Set voltage progress bar:
   ui_->hvprogressbar->setValue(abs((int)hv_volts_));
-
-  //If connected, update the live and real times.
-  if(daq_status_!=kDAQStatusUnknown){
-      QString live,real,dead;
-      if(daq_thread_->getLiveTime() < 0){
-          ui_->liveTime->setText(QString("Live Time: ???"));
-          ui_->realTime->setText(QString("Real Time: ???"));
-          ui_->deadTime->setText(QString("Dead Time: "));
-      }else{
-      live.sprintf("%.2f",daq_thread_->getLiveTime()/1000000);
-      real.sprintf("%.2f",daq_thread_->getRealTime()/1000000);
-      dead.sprintf("%.2f",(daq_thread_->getRealTime()-daq_thread_->getLiveTime())/daq_thread_->getRealTime()*100);
-      ui_->liveTime->setText(QString("Live Time: ") + live + ' s');
-      ui_->realTime->setText(QString("Real Time: ") + real + ' s');
-      ui_->deadTime->setText(QString("Dead Time: ") + dead + '%');
-      }
-  }
 
 }
 

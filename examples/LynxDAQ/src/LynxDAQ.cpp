@@ -154,7 +154,7 @@ int LynxDAQ::StartDataAcquisition() {
 }
 
 int LynxDAQ::AcquireData(int n) {
-    //cout<<"Acquiring Data..."<<endl;
+    cout<<"Acquiring Data..."<<endl;
 
 
     if(simMode && isSimulating){
@@ -174,7 +174,7 @@ int LynxDAQ::AcquireData(int n) {
                 Time = 34534+simModeTime;//ceil((double)rand()/RAND_MAX*1e6)+Time;
             }
             ts.push_back(Time);
-            ts_sec.push_back((double)Time/1e6+(double)dt/1000);
+            ts_sec.push_back((double)Time/1e6);
         }
 
         simModeTime = Time;
