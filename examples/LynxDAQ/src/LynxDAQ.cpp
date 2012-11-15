@@ -154,7 +154,7 @@ int LynxDAQ::StartDataAcquisition() {
 }
 
 int LynxDAQ::AcquireData(int n) {
-    cout<<"Acquiring Data..."<<endl;
+    //cout<<"Acquiring Data..."<<endl;
 
 
     if(simMode && isSimulating){
