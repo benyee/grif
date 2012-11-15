@@ -236,7 +236,8 @@ int LynxDAQ::AcquireData(int n) {
 
         //Store the data to be posted:
         ADC.push_back((double)recEvent);
-        ts.push_back((qint64)(Time*cnv));
+        ts.push_back(start_time_.secsTo(QDateTime::currentDateTime())*1e6);
+        //ts.push_back((qint64)(Time*cnv));
         //Edit the time stamp so that it's in seconds relative to ref_time
         ts_sec.push_back((double)(Time*cnv)/1e6+(double)dt/1000);
 
