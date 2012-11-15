@@ -141,7 +141,7 @@ int LynxDAQ::Initialize(){
 int LynxDAQ::StartDataAcquisition() {
     cout<<"Starting Data Acquisition"<<endl;
   start_time_ = QDateTime::currentDateTime();
-  dt = ref_time_.msecsTo(start_time_);
+  dt = ref_time_.secsTo(start_time_);
   InitializeAccumulators(start_time_,0);
 
   if(!simMode){
@@ -154,7 +154,7 @@ int LynxDAQ::StartDataAcquisition() {
 }
 
 int LynxDAQ::AcquireData(int n) {
-    cout<<"Acquiring Data..."<<endl;
+    //cout<<"Acquiring Data..."<<endl;
 
 
     if(simMode && isSimulating){
@@ -169,19 +169,23 @@ int LynxDAQ::AcquireData(int n) {
             //Generate a random event, with a timestamp a random time ahead of the previous one
             ADC.push_back(ceil((double)rand()/RAND_MAX*8192));
             if(i == 0){
-                Time = 43543+simModeTime;//ceil((double)rand()/RAND_MAX*1e6)+simModeTime;
+                Time = ceil((double)rand()/RAND_MAX*1e4)+simModeTime;
             }else{
-                Time = 34534+simModeTime;//ceil((double)rand()/RAND_MAX*1e6)+Time;
+                Time = ceil((double)rand()/RAND_MAX*1e4)+Time;
             }
-            ts.push_back(Time);
-            ts_sec.push_back((double)Time/1e6);
+            GRISleep::msleep(10);
+            ts.push_back(-QDateTime::currentDateTime().secsTo(start_time_)*1e6);
+            ts_sec.push_back(Time/1e6);
+
+            if(i==numData-1){
+                simModeTime = Time;
+            }
         }
 
-        simModeTime = Time;
-
-        PostData<double>(ADC.size(), "ADCOutput",&ADC[0],&ts[0]);
-        PostData<double>(ADC.size(), "TS",&ts_sec[0],&ts[0]);
-        cout<<"Posting simulated data..."<<endl;
+        std::cout<<simModeTime<<endl;
+        PostData<double>(numData, "ADCOutput",&ADC[0],&ts[0]);
+        PostData<double>(numData, "TS",&ts_sec[0],&ts[0]);
+        //cout<<"Posting simulated data..."<<endl;
 
 
         return 0;
