@@ -514,7 +514,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>100</y>
+        <y>120</y>
         <width>161</width>
         <height>21</height>
        </rect>
@@ -586,6 +586,19 @@ p, li { white-space: pre-wrap; }
       </property>
       <property name="text">
        <string>ROI R:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="deadTime">
+      <property name="geometry">
+       <rect>
+        <x>150</x>
+        <y>70</y>
+        <width>171</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Dead Time: </string>
       </property>
      </widget>
     </widget>

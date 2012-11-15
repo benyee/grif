@@ -31,7 +31,7 @@ DAQControlWidget::DAQControlWidget(QWidget *parent, LynxDAQ *daq, SIMAnalysisThr
 
   // set up a timer to update widget
   update_timer_ = new QTimer();
-  update_timer_->setInterval(1000);
+  update_timer_->setInterval(2000);
   update_timer_->start();
 
   // set up timer to be used for HV enable
@@ -216,11 +216,19 @@ void DAQControlWidget::Update() {
 
   //If connected, update the live and real times.
   if(daq_status_!=kDAQStatusUnknown){
-      QString live,real;
-      live.sprintf("%.2f",daq_thread_->LiveTime()/1000000);
-      real.sprintf("%.2f",daq_thread_->RealTime()/1000000);
+      QString live,real,dead;
+      if(daq_thread_->getLiveTime() < 0){
+          ui_->liveTime->setText(QString("Live Time: ???"));
+          ui_->realTime->setText(QString("Real Time: ???"));
+          ui_->deadTime->setText(QString("Dead Time: "));
+      }else{
+      live.sprintf("%.2f",daq_thread_->getLiveTime()/1000000);
+      real.sprintf("%.2f",daq_thread_->getRealTime()/1000000);
+      dead.sprintf("%.2f",(daq_thread_->getRealTime()-daq_thread_->getLiveTime())/daq_thread_->getRealTime()*100);
       ui_->liveTime->setText(QString("Live Time: ") + live + ' s');
       ui_->realTime->setText(QString("Real Time: ") + real + ' s');
+      ui_->deadTime->setText(QString("Dead Time: ") + dead + '%');
+      }
   }
 
 }
@@ -268,8 +276,8 @@ void DAQControlWidget::StartStopAcq(){
         std::fstream logfile(ui_->logFileName->toPlainText().toStdString()+".txt",std::ios::app);
         logfile<< QDateTime::currentDateTime().toString("(yyyy, MMM dd; hh:mm:ss.zzz) ").toStdString() + " Stopping acquisition"<<'\n';
         QString live,real;
-        live.sprintf("%.2f",daq_thread_->LiveTime()/1000000);
-        real.sprintf("%.2f",daq_thread_->RealTime()/1000000);
+        live.sprintf("%.2f",daq_thread_->getLiveTime()/1000000);
+        real.sprintf("%.2f",daq_thread_->getRealTime()/1000000);
         logfile<<"Live Time: "<<live.toStdString()<<" s"<<'\n';
         logfile<<"Real Time: "<<real.toStdString()<<" s"<<'\n';
         logfile<< "=================================="<<'\n';

@@ -39,6 +39,9 @@ class LynxDAQ : public GRIDAQThread {
   double LiveTime(){if (simMode){return 0.0;} return (double)lynx->GetParameter(DevCntl::Elapsed_Live, input);}
   double RealTime(){if (simMode){return 0.0;} return (double)lynx->GetParameter(DevCntl::Elapsed_Real, input);}
 
+  double getLiveTime(){if (simMode){return 0.0;} return currLiveTime;};
+  double getRealTime(){if (simMode){return 0.0;} return currRealTime;};
+
   bool isSimMode(){return simMode;}
   void setSimMode(bool x){simMode = x;}
 
