@@ -23,12 +23,16 @@
 #include <QPair>
 #include "SIMAnalysisThread.h"
 
-SIMAnalysisThread::SIMAnalysisThread(double x, std::string s) {
+SIMAnalysisThread::SIMAnalysisThread(double x, std::string inp_rawfilename, int inp_maxLineCount) {
     dataLength = x;
-    setFileName(s);
     isPlotting1 = false;
     isPlotting2 = false;
     isOutputFileOpen = false;
+
+    maxLineCount = inp_maxLineCount;
+    lineCount = 0;
+    fileNumber = 0;
+    setFileName(inp_rawfilename, false);
 
     CreateNewHistogram("Histogram1",8192,0.0,8192.0);
     GetHistogram("Histogram1")->set_rate_mode(true);
@@ -77,8 +81,17 @@ int SIMAnalysisThread::Analyze() {
         //Write new raw data to file and then store it:
         for(int i = 0; i < nADC; i++){
             outfile<< ADC[i]<<'\t'<<std::setprecision(25)<<ts_sec[i]<<'\n';
+            lineCount++;
             storedEvents.first.push_back(ADC[i]);
             storedEvents.second.push_back(ts_sec[i]);
+        }
+
+        if(lineCount >= maxLineCount){
+            closeFile();
+            fileNumber++;
+            setFileName(filename,false);
+            openFile();
+            lineCount = 0;
         }
     }
 
@@ -87,13 +100,14 @@ int SIMAnalysisThread::Analyze() {
     return 0;
 }
 
-void SIMAnalysisThread::setFileName(std::string s,bool timestamp, std::string ext){
-    if (timestamp){
-            std::string temp = QDateTime::currentDateTime().toString("yyyyMMdd__hhmm_ss_zzz").toStdString();
-            filename = s +"_"+ temp + ext;
+void SIMAnalysisThread::setFileName(std::string s,bool restart, std::string ext){
+    if(restart){
+        std::string temp = QDateTime::currentDateTime().toString("yyyyMMdd__hhmm_ss_zzz").toStdString();
+        rawfilename =  s +"_"+ temp;
     }
-    else{filename = s + ext;}
 
+    if (restart) {fileNumber = 0;}
+    filename = rawfilename +"_" + QString::number(fileNumber).toStdString()+ ext;
 }
 
 void SIMAnalysisThread::setHistRate(double rate, int histNum){

@@ -173,7 +173,6 @@ int LynxDAQ::AcquireData(int n) {
             }else{
                 Time = ceil((double)rand()/RAND_MAX*1e4)+Time;
             }
-            GRISleep::msleep(10);
             ts.push_back(-QDateTime::currentDateTime().secsTo(start_time_)*1e6);
             ts_sec.push_back(Time/1e6);
 

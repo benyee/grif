@@ -36,11 +36,11 @@
 
 class SIMAnalysisThread : public GRIAnalysisThread {
  public:
-    SIMAnalysisThread(double x = 60, std::string s = "out.txt"); //Set the default storage time and output file name.
+    SIMAnalysisThread(double x = 60, std::string inp_rawfilename = "out", int inp_maxLineCount = 1e5); //Set the default storage time and output file name.
     ~SIMAnalysisThread();
 
     int Analyze();
-    void setFileName(std::string s,bool timestamp = true, std::string ext = ".txt");
+    void setFileName(std::string s,bool restart = true, std::string ext = ".txt");
     void setBinning(int nBins, double xMax);
 
     std::string getFileName(){return filename;}
@@ -63,7 +63,12 @@ class SIMAnalysisThread : public GRIAnalysisThread {
     //  has the data from the last 10000 [insert units of the timestamp here] of collection)
     //  Default for LynxDAQ output from the TS ReadData is in seconds.
 
+    int lineCount; //Number lines written in the current file.
+    int maxLineCount; //Maximum number of lines in a file.
+    int fileNumber; //
+
     std::string filename;  //File name for raw data output.
+    std::string rawfilename; //File name without extension.
     std::fstream outfile;
     bool isPlotting1;
     bool isPlotting2;

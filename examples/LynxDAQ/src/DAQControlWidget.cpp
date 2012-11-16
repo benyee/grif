@@ -292,8 +292,8 @@ void DAQControlWidget::StartStopAcq(){
 
         if(!reg_started_){  //the regulator hasn't started (acquisition had started outside the GUI)
             daq_thread_->StopDataAcquisition(); //stop acquisition without doing anything else.
-            an_thread_->closeFile();
             ui_->daqstartstop->setEnabled(true);
+            an_thread_->closeFile();
             return;
         }
 
@@ -302,10 +302,10 @@ void DAQControlWidget::StartStopAcq(){
 
         //Otherwise, the regulator has started.
         daq_thread_->StopCollection();
-        an_thread_->closeFile();
 
         ui_->daqstartstop->setEnabled(false); //Disable button until it fully stops.
         GRISleep::msleep(2500); //Wait until the appropriate threads have stopped.
+        an_thread_->closeFile();
         ui_->daqstartstop->setEnabled(true);
 
     }
