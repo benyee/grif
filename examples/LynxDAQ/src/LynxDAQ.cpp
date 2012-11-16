@@ -141,7 +141,7 @@ int LynxDAQ::Initialize(){
 int LynxDAQ::StartDataAcquisition() {
     cout<<"Starting Data Acquisition"<<endl;
   start_time_ = QDateTime::currentDateTime();
-  dt = ref_time_.secsTo(start_time_);
+  dt = ref_time_.msecsTo(start_time_);
   InitializeAccumulators(start_time_,0);
 
   if(!simMode){
@@ -154,7 +154,7 @@ int LynxDAQ::StartDataAcquisition() {
 }
 
 int LynxDAQ::AcquireData(int n) {
-    //cout<<"Acquiring Data..."<<endl;
+    cout<<"Acquiring Data..."<<endl;
 
 
     if(simMode && isSimulating){
@@ -235,8 +235,11 @@ int LynxDAQ::AcquireData(int n) {
 
         //Store the data to be posted:
         ADC.push_back((double)recEvent);
+
+        //Pass along timestamp for GRIF as the current acquisition time:
         ts.push_back(start_time_.secsTo(QDateTime::currentDateTime())*1e6);
         //ts.push_back((qint64)(Time*cnv));
+
         //Edit the time stamp so that it's in seconds relative to ref_time
         ts_sec.push_back((double)(Time*cnv)/1e6+(double)dt/1000);
 
