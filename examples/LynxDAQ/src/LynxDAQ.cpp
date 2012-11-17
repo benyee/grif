@@ -40,6 +40,8 @@ int LynxDAQ::ConnectToDAQ(){//Open a connection to the device
         return 0;
     }
 
+    prevTime = 0;
+    numRollovers = 0;
     try{
         if(isConnected){ //If already connected, recreate a new instance of lynx.
             //Release ownership
@@ -223,8 +225,8 @@ int LynxDAQ::AcquireData(int n) {
             Time = RolloverTime | (recTime & 0x7FFF);
         }
         else {
-            long LSBofTC = 0;
-            long MSBofTC = 0;
+            unsigned long LSBofTC = 0;
+            unsigned long MSBofTC = 0;
             LSBofTC |= (recTime & 0x7FFF) << 15;
             MSBofTC |= recEvent << 30;
             RolloverTime = MSBofTC | LSBofTC;
@@ -240,8 +242,12 @@ int LynxDAQ::AcquireData(int n) {
         ts.push_back(start_time_.secsTo(QDateTime::currentDateTime())*1e6);
         //ts.push_back((qint64)(Time*cnv));
 
+        //Check if clock has reset:
+        if(Time < prevTime){numRollovers++;}
+        prevTime = Time;
+        //Clock resets every 2e32/1e7 seconds
         //Edit the time stamp so that it's in seconds relative to ref_time
-        ts_sec.push_back((double)(Time*cnv)/1e6+(double)dt/1000);
+        ts_sec.push_back((double)(Time*cnv)/1e6+(double)dt/1000+(double)numRollovers*2.0e32/1e7);
 
         //Reset the timestamp and repeat
         Time=0;

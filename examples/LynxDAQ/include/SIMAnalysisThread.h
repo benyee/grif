@@ -36,7 +36,7 @@
 
 class SIMAnalysisThread : public GRIAnalysisThread {
  public:
-    SIMAnalysisThread(double x = 60, std::string inp_rawfilename = "out", int inp_maxLineCount = 1e5); //Set the default storage time and output file name.
+    SIMAnalysisThread(double x = 60, std::string inp_rawfilename = "out", int inp_maxLineCount = 2e5); //Set the default storage time and output file name.
     ~SIMAnalysisThread();
 
     int Analyze();

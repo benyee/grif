@@ -61,6 +61,8 @@ class LynxDAQ : public GRIDAQThread {
   long input; //Set to 1
   double currLiveTime; //Live and real times currently stored by Lynx (either for this acquisition or a previous one)
   double currRealTime;
+  unsigned __int64 prevTime;
+  int numRollovers;
   DevCntl::IDevicePtr lynx;
   VARIANT Args; //Lynx related parameter.. has to do with the device's current setup?
   variant_t timeBase; //Lynx related parameter.. has something to do with how timestamps are output.
