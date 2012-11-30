@@ -59,7 +59,7 @@
 ///     /// Talk to hardware
 ///   }
 /// 
-///   int Initialize() {
+///   int Initalize() {
 ///     /// Initialize DAQ hardware
 ///   }
 /// 
@@ -443,4 +443,4 @@ template <class T> int GRIDAQThread::PostData(int numel, QString buffer_name,
   return 1;
 }
 
-#endif
+#endif  // GRIF_FRAMEWORK_INCLUDE_CORE_GRIDAQTHREAD_H_

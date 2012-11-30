@@ -77,7 +77,7 @@ int SIMMCAnalysisThread::Analyze() {
     }
     // Add array of ADCs from this channel to the channel's histogram
     QString histname = "ADC Channel "+QString::number(channel);
-    if (GetHistogram(histname) and ADCs_from_channel.size()>0) {
+    if (GetHistogram(histname) && ADCs_from_channel.size()>0) {
       UpdateHistogram(histname, &(ADCs_from_channel[0]),ADCs_from_channel.size());
     }
   }
@@ -122,7 +122,7 @@ int SIMMCAnalysisThread::Analyze() {
     }
     // Add array of ADCs from this channel to the channel's histogram
     QString histname = "ADC Channel "+QString::number(channel);
-    if (GetHistogram(histname) and ADCs_from_channel.size()>0) {
+    if (GetHistogram(histname) && ADCs_from_channel.size()>0) {
       UpdateHistogram(histname, &(ADCs_from_channel[0]),ADCs_from_channel.size());
     }
   }
