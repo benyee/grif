@@ -99,6 +99,7 @@ DAQControlWidget::~DAQControlWidget() {
   delete ui_;
   delete update_timer_;
   delete hv_enable_timer_;
+  delete time_timer_;
   delete daq_thread_;
   delete an_thread_;
   delete reg;

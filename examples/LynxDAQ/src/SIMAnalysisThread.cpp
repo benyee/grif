@@ -51,7 +51,7 @@ void SIMAnalysisThread::setBinning(int nBins, double xMax){
 }
 
 int SIMAnalysisThread::Analyze() {
-    std::cout<<"Starting Analysis Sequence...";
+    //std::cout<<"Starting Analysis Sequence...";
 
     int nADC;
 
@@ -95,7 +95,7 @@ int SIMAnalysisThread::Analyze() {
         }
     }
 
-    std::cout<<"Finished analysis sequence."<<std::endl;
+    //std::cout<<"Finished analysis sequence."<<std::endl;
 
     return 0;
 }

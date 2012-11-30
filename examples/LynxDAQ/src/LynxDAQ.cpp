@@ -156,7 +156,7 @@ int LynxDAQ::StartDataAcquisition() {
 }
 
 int LynxDAQ::AcquireData(int n) {
-    cout<<"Acquiring Data..."<<endl;
+    //cout<<"Acquiring Data..."<<endl;
 
 
     if(simMode && isSimulating){
@@ -242,12 +242,12 @@ int LynxDAQ::AcquireData(int n) {
         ts.push_back(start_time_.secsTo(QDateTime::currentDateTime())*1e6);
         //ts.push_back((qint64)(Time*cnv));
 
-        //Check if clock has reset:
-        if(Time < prevTime){numRollovers++;}
+        //Check if clock has reset (Note that the -1e8 is there just in case there's a small blip in Time):
+        if(Time < min(prevTime,prevTime-1e8)){numRollovers++; cout<<Time<<'\t'<<prevTime<<'\t'<<numRollovers<<endl;}
         prevTime = Time;
         //Clock resets every 2e32/1e7 seconds
         //Edit the time stamp so that it's in seconds relative to ref_time
-        ts_sec.push_back((double)(Time*cnv)/1e6+(double)dt/1000+(double)numRollovers*2.0e32/1e7);
+        ts_sec.push_back((double)(Time*cnv)/1e6+(double)dt/1000+numRollovers*pow(2.0,32)/1.0e7);
 
         //Reset the timestamp and repeat
         Time=0;
