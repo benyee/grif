@@ -55,6 +55,7 @@ int main(int argc, char* argv[])
     histDraw1->set_outline_color(Qt::cyan);
     histDraw1->set_xlabel("Channel");
     histDraw1->set_ylabel("Counts");
+    histDraw1->SetLogScale(true);
     win1->resize(450,300);
     win1->show();
 
@@ -100,7 +101,12 @@ int main(int argc, char* argv[])
 //    win1->setWindowTitle("1D Histogram");
 //    win1->resize(450,300);
 //    win1->show();
+    QObject::connect(qApp, SIGNAL(lastWindowClosed()), qApp, SLOT(quit()));
 
-    return app.exec();
+    app.exec();
+
+    delete(win1);
+    delete(win2);
+    delete(controlGUI);
 }
 

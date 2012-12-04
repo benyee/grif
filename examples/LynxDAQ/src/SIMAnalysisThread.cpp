@@ -34,12 +34,14 @@ SIMAnalysisThread::SIMAnalysisThread(double x, std::string inp_rawfilename, int 
     fileNumber = 0;
     setFileName(inp_rawfilename, false);
 
-    CreateNewHistogram("Histogram1",8192,0.0,8192.0);
-    GetHistogram("Histogram1")->set_rate_mode(true);
-    GetHistogram("Histogram1")->set_packet_scale_factor(1);
-    CreateNewHistogram("Histogram2",8192,0.0,8192.0);
+    int nChan = 8192;
+    double minChan = 0.0;
+    double maxChan = 8192.0;
+    CreateNewHistogram("Histogram1",nChan,minChan,maxChan);
+    GetHistogram("Histogram1")->set_rate_mode(false);
+    CreateNewHistogram("Histogram2",nChan,minChan,maxChan);
     GetHistogram("Histogram2")->set_rate_mode(true);
-    GetHistogram("Histogram2")->set_packet_scale_factor(0.5);
+    GetHistogram("Histogram2")->set_packet_scale_factor(0.1);
 }
 
 SIMAnalysisThread::~SIMAnalysisThread() {
