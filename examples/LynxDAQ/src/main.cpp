@@ -55,7 +55,6 @@ int main(int argc, char* argv[])
     histDraw1->set_outline_color(Qt::cyan);
     histDraw1->set_xlabel("Channel");
     histDraw1->set_ylabel("Counts");
-    histDraw1->SetLogScale(true);
     win1->resize(450,300);
     win1->show();
 
