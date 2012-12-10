@@ -67,14 +67,14 @@ DAQControlWidget::DAQControlWidget(QWidget *parent, LynxDAQ *daq, SIMAnalysisThr
 
 
   //start the signal and slot pairs...
-  connect(update_timer_, SIGNAL(timeout()), this, SLOT(Update(),Qt::QueuedConnection));
-  connect(time_timer_, SIGNAL(timeout()), this, SLOT(UpdateTimes(),Qt::QueuedConnection) );
+  connect(update_timer_, SIGNAL(timeout()), this, SLOT(Update()));
+  connect(time_timer_, SIGNAL(timeout()), this, SLOT(UpdateTimes()) );
 
   connect(ui_->hvon, SIGNAL(clicked()), this, SLOT(SetHVOn()));
   connect(ui_->hvoff, SIGNAL(clicked()), this, SLOT(SetHVOff()));
 
   connect(ui_->hvenablebutton, SIGNAL(clicked()), this, SLOT(EnableHVControl()));
-  connect(hv_enable_timer_, SIGNAL(timeout()), this, SLOT(DisableHVControl(),Qt::QueuedConnection) );
+  connect(hv_enable_timer_, SIGNAL(timeout()), this, SLOT(DisableHVControl()) );
 
   connect(ui_->simToggle,SIGNAL(clicked()),this,SLOT(ToggleSim()));
   connect(ui_->daqconnect,SIGNAL(clicked()),this,SLOT(Connect()));
