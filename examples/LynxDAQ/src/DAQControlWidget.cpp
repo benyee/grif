@@ -36,7 +36,7 @@ DAQControlWidget::DAQControlWidget(QWidget *parent, LynxDAQ *daq, SIMAnalysisThr
 
   // set up timer to be used for HV enable
   hv_enable_timer_ = new QTimer();
-  hv_enable_timer_->setInterval(500);
+  hv_enable_timer_->setInterval(1000);
   DisableHVControl();
 
   // Timer for updating real/live times:
