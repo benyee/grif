@@ -202,6 +202,11 @@ int LynxDAQ::AcquireData(int n) {
 
     //Get Event/Time list:
     variant_t tlistD = Utilities::Get1DSafeArrayElement (listB, 6);
+
+    //This gives you the live time associated with the packet...
+    //variant_t tlistE = Utilities::Get1DSafeArrayElement(listB,3);
+    //std::cout<<(int)tlistE<<"HELLOOOO"<<std::endl;
+
     //# of elements in tlistD (note that this is NOT the # of events due to rollover bits)
     LONG numE = Utilities::GetCount (tlistD);
 
