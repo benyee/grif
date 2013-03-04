@@ -8,5 +8,6 @@
   <DataBlocks> 
     <Data block = "ADCOutput" /> 
     <Data block = "TS" />
+    <Data block = "LiveTime" />
   </DataBlocks> 
 </class>

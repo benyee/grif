@@ -8,5 +8,6 @@
   <Links>
     <link writer = "LynxDAQ" reader = "A1" data = "ADCOutput"></link>
     <link writer = "LynxDAQ" reader = "A1" data = "TS"></link>
+    <link writer = "LynxDAQ" reader = "A1" data = "LiveTime"></link>
   </Links>
 </app>

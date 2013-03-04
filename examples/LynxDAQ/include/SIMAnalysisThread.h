@@ -63,8 +63,8 @@ class SIMAnalysisThread : public GRIAnalysisThread {
     //  has the data from the last 10000 [insert units of the timestamp here] of collection)
     //  Default for LynxDAQ output from the TS ReadData is in seconds.
 
-    int lineCount; //Number lines written in the current file.
-    int maxLineCount; //Maximum number of lines in a file.
+    long lineCount; //Number lines written in the current file.
+    long maxLineCount; //Maximum number of lines in a file.
     int fileNumber; //
 
     std::string filename;  //File name for raw data output.

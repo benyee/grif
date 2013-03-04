@@ -28,6 +28,8 @@ GRIDAQBaseAccumNode* LynxDAQ::RegisterDataOutput(QString outName) {
     p = new GRIDAQAccumulator<double>(outName,1e6,5,250);
   } else if (outName == "TS") {
     p = new GRIDAQAccumulator<double>(outName,1e6,5,250);
+  } else if (outName == "LiveTime"){
+    p = new GRIDAQAccumulator<double>(outName,1e6,5,250);
   }
   return p;
 }
@@ -183,9 +185,14 @@ int LynxDAQ::AcquireData(int n) {
             }
         }
 
+        vector<double> templivetime;
+        vector<qint64> first_ts;
+        first_ts.push_back(ts[0]);
+        templivetime.push_back(0.0);
         std::cout<<simModeTime<<endl;
         PostData<double>(numData, "ADCOutput",&ADC[0],&ts[0]);
         PostData<double>(numData, "TS",&ts_sec[0],&ts[0]);
+        PostData<double>(1,"LiveTime",&templivetime[0],&first_ts[0]);
         //cout<<"Posting simulated data..."<<endl;
 
 
@@ -258,12 +265,21 @@ int LynxDAQ::AcquireData(int n) {
         Time=0;
     }
 
-    PostData<double>(ADC.size(), "ADCOutput",&ADC[0],&ts[0]);
-    PostData<double>(ADC.size(), "TS",&ts_sec[0],&ts[0]);
-
     //Update the real/live times - this is important for checking if the system is in acquisition.
     currRealTime = RealTime();
     currLiveTime = LiveTime();
+
+    vector<double> templivetime;
+    //vector<qint64> first_ts;
+    //first_ts.push_back(ts[0]);
+
+    for(int i = 0; i< ADC.size(); i++){
+        templivetime.push_back(currLiveTime);
+    }
+
+    PostData<double>(ADC.size(), "ADCOutput",&ADC[0],&ts[0]);
+    PostData<double>(ADC.size(), "TS",&ts_sec[0],&ts[0]);
+    PostData<double>(ADC.size(),"LiveTime",&templivetime[0],&ts[0]);
 
     return 0;
 }

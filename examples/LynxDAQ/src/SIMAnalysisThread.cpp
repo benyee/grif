@@ -59,12 +59,15 @@ int SIMAnalysisThread::Analyze() {
 
     QPair<int, double*> pADC = ReadData<double>("LynxDAQ","ADCOutput");
     QPair<int, double*> pTS = ReadData<double>("LynxDAQ","TS");
+    QPair<int, double*> pLiveTime = ReadData<double>("LynxDAQ","LiveTime");
     nADC = pADC.first;
 
     if(nADC> 0){
         double* ADC; //bin number or energy
         double* ts_sec; //timestamp in seconds
-        ADC = pADC.second; ts_sec = pTS.second;
+        double liveTime;
+        ADC = pADC.second; ts_sec = pTS.second; liveTime = pLiveTime.second[0];
+        std::cout<<liveTime<<std::endl;
 
         if(isPlotting1){
             UpdateHistogram("Histogram1",ADC,nADC);
@@ -82,7 +85,7 @@ int SIMAnalysisThread::Analyze() {
 
         //Write new raw data to file and then store it:
         for(int i = 0; i < nADC; i++){
-            outfile<< ADC[i]<<'\t'<<std::setprecision(25)<<ts_sec[i]<<'\n';
+            outfile<< ADC[i]<<'\t'<<std::setprecision(25)<<ts_sec[i]<<'\t'<<std::setprecision(25)<<liveTime<<'\n';
             lineCount++;
             storedEvents.first.push_back(ADC[i]);
             storedEvents.second.push_back(ts_sec[i]);
