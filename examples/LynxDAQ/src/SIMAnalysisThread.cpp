@@ -85,11 +85,13 @@ int SIMAnalysisThread::Analyze() {
 
         //Write new raw data to file and then store it:
         for(int i = 0; i < nADC; i++){
-            outfile<< ADC[i]<<'\t'<<std::setprecision(25)<<ts_sec[i]<<'\t'<<std::setprecision(25)<<liveTime<<'\n';
+            //outfile<< ADC[i]<<'\t'<<std::setprecision(25)<<ts_sec[i]<<'\t'<<std::setprecision(25)<<liveTime<<'\n';
+            outfile<< ADC[i]<<'\t'<<std::setprecision(20)<<ts_sec[i]<<'\n';
             lineCount++;
             storedEvents.first.push_back(ADC[i]);
             storedEvents.second.push_back(ts_sec[i]);
         }
+        outfile<< -9999 <<'\t'<<std::setprecision(25)<<liveTime<<'\n';
 
         if(lineCount >= maxLineCount){
             closeFile();

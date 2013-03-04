@@ -145,7 +145,9 @@ int LynxDAQ::Initialize(){
 int LynxDAQ::StartDataAcquisition() {
     cout<<"Starting Data Acquisition"<<endl;
   start_time_ = QDateTime::currentDateTime();
-  dt = ref_time_.msecsTo(start_time_);
+  //dt = ref_time_.msecsTo(start_time_);
+  //For now, we will ignore this to save on space and memory
+  dt = 0;
   InitializeAccumulators(start_time_,0);
 
   if(!simMode){
@@ -273,8 +275,10 @@ int LynxDAQ::AcquireData(int n) {
     //vector<qint64> first_ts;
     //first_ts.push_back(ts[0]);
 
-    for(int i = 0; i< ADC.size(); i++){
-        templivetime.push_back(currLiveTime);
+    //Only the first livetime will be read:
+    templivetime.push_back(currLiveTime);
+    for(int i = 1; i< ADC.size(); i++){
+        templivetime.push_back(0);
     }
 
     PostData<double>(ADC.size(), "ADCOutput",&ADC[0],&ts[0]);

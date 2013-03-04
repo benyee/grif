@@ -152,7 +152,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Reference Time:</string>
+       <string>Reference Time: (ignore this)</string>
       </property>
      </widget>
      <widget class="QTextEdit" name="logFileName">
