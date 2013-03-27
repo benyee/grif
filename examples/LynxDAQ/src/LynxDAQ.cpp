@@ -257,7 +257,10 @@ int LynxDAQ::AcquireData(int n) {
         //ts.push_back((qint64)(Time*cnv));
 
         //Check if clock has reset (Note that the -1e8 is there just in case there's a small blip in Time):
-        if(Time < min(prevTime,prevTime-1e8)){numRollovers++; cout<<Time<<'\t'<<prevTime<<'\t'<<numRollovers<<endl;}
+        if(Time < min(prevTime,prevTime-1e8)){
+            numRollovers++;
+            //cout<<Time<<'\t'<<prevTime<<'\t'<<numRollovers<<endl;
+        }
         prevTime = Time;
         //Clock resets every 2e32/1e7 seconds
         //Edit the time stamp so that it's in seconds relative to ref_time
@@ -275,15 +278,19 @@ int LynxDAQ::AcquireData(int n) {
     //vector<qint64> first_ts;
     //first_ts.push_back(ts[0]);
 
+    int nADC = ADC.size();
     //Only the first livetime will be read:
     templivetime.push_back(currLiveTime);
-    for(int i = 1; i< ADC.size(); i++){
-        templivetime.push_back(0);
+    for(int i = 1; i< nADC; i++){
+        templivetime.push_back(currLiveTime);
+        //templivetime.push_back(0);
     }
 
-    PostData<double>(ADC.size(), "ADCOutput",&ADC[0],&ts[0]);
-    PostData<double>(ADC.size(), "TS",&ts_sec[0],&ts[0]);
-    PostData<double>(ADC.size(),"LiveTime",&templivetime[0],&ts[0]);
+    PostData<double>(nADC, "ADCOutput",&ADC[0],&ts[0]);
+    PostData<double>(nADC, "TS",&ts_sec[0],&ts[0]);
+    PostData<double>(nADC,"LiveTime",&templivetime[0],&ts[0]);
+
+    std::cout<<"DAQ ts[ADC.size()]: "<<ts[nADC-1]<<"\t DAQ ts_sec: "<<ts_sec[nADC-1]<<std::endl;
 
     return 0;
 }
@@ -298,7 +305,7 @@ int LynxDAQ::StopDataAcquisition(){
     Utilities::disableAcquisition(lynx, input);
     cout<<"Disabled Acquisition"<<endl;
 
-    //Update the real/live times - this is important for checking if the systme is in acquisition.
+    //Update the real/live times - this is important for checking if the system is in acquisition.
     currRealTime = RealTime();
     currLiveTime = LiveTime();
 

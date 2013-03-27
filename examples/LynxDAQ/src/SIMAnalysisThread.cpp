@@ -67,7 +67,14 @@ int SIMAnalysisThread::Analyze() {
         double* ts_sec; //timestamp in seconds
         double liveTime;
         ADC = pADC.second; ts_sec = pTS.second; liveTime = pLiveTime.second[0];
-        std::cout<<liveTime<<std::endl;
+        //Trying to figure out why the live time is sometimes zero:
+        if(liveTime < 1e4){
+            std::cout<<"HELLOOOOO"<<std::endl;
+            std::cout<<"liveTime ="<<liveTime<<std::endl;
+            std::cout<<ADC[0]<<'\t'<<ts_sec[0]<<std::endl;
+            std::cout<<"Length of data: "<<nADC<<std::endl;
+            liveTime = pLiveTime.second[nADC-1];
+        }
 
         if(isPlotting1){
             UpdateHistogram("Histogram1",ADC,nADC);
@@ -100,6 +107,8 @@ int SIMAnalysisThread::Analyze() {
             openFile();
             lineCount = 0;
         }
+
+        std::cout<<"\t Analysis ts_sec: "<<ts_sec[nADC-1]<<std::endl;
     }
 
     //std::cout<<"Finished analysis sequence."<<std::endl;
