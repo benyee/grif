@@ -55,6 +55,7 @@ class SIMAnalysisThread : public GRIAnalysisThread {
     void closeFile(){if(isOutputFileOpen){outfile.close();isOutputFileOpen = false;}}
 
  private:
+    //The following two variables currently do nothing.
     QPair<std::vector<double>,std::vector<double> > storedEvents;
     //This Qpair will store all the events of within the last dataLength of acquisition time.
 

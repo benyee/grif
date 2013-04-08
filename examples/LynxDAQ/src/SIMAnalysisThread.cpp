@@ -83,20 +83,22 @@ int SIMAnalysisThread::Analyze() {
             UpdateHistogram("Histogram2",ADC,nADC);
         }
 
+        //I'm getting rid of this temporarily to see whether it helps...
+        /*
         //Erase old data by iterating through and seeing how old the stored data is relative to the new data:
         //If the data entry is more than dataLength older than dataLength, delete it.
         while(storedEvents.first.size()>0 && ts_sec[nADC-1] - *storedEvents.second.begin() > dataLength){
             storedEvents.first.erase(storedEvents.first.begin());
             storedEvents.second.erase(storedEvents.second.begin());
-        }
+        }*/
 
         //Write new raw data to file and then store it:
         for(int i = 0; i < nADC; i++){
             //outfile<< ADC[i]<<'\t'<<std::setprecision(25)<<ts_sec[i]<<'\t'<<std::setprecision(25)<<liveTime<<'\n';
             outfile<< ADC[i]<<'\t'<<std::setprecision(20)<<ts_sec[i]<<'\n';
             lineCount++;
-            storedEvents.first.push_back(ADC[i]);
-            storedEvents.second.push_back(ts_sec[i]);
+            //storedEvents.first.push_back(ADC[i]);
+            //storedEvents.second.push_back(ts_sec[i]);
         }
         outfile<< -9999 <<'\t'<<std::setprecision(25)<<liveTime<<'\n';
 
@@ -108,7 +110,9 @@ int SIMAnalysisThread::Analyze() {
             lineCount = 0;
         }
 
-        std::cout<<"\t Analysis ts_sec: "<<ts_sec[nADC-1]<<std::endl;
+        std::cout<<"Analysis ts_sec: "<<std::endl;
+        std::cout<<ts_sec[nADC-1]<<std::endl;
+
     }
 
     //std::cout<<"Finished analysis sequence."<<std::endl;

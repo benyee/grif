@@ -286,11 +286,23 @@ int LynxDAQ::AcquireData(int n) {
         //templivetime.push_back(0);
     }
 
+    if (nADC != ts.size()){
+        std::cout<<"Problem 1"<<std::endl;
+    }else if (nADC != ts_sec.size()){
+        std::cout<<"Problem 2"<<std::endl;
+    }
+
+    /*
+    std::cout<<"DAQ ts[nADC-1]: "<<std::endl;
+    std::cout<<ts.back()<<std::endl;
+    std::cout<<"DAQ ts_sec: "<<std::endl;
+    std::cout<<ts_sec.back()<<std::endl;
+    */
+
     PostData<double>(nADC, "ADCOutput",&ADC[0],&ts[0]);
     PostData<double>(nADC, "TS",&ts_sec[0],&ts[0]);
     PostData<double>(nADC,"LiveTime",&templivetime[0],&ts[0]);
 
-    std::cout<<"DAQ ts[ADC.size()]: "<<ts[nADC-1]<<"\t DAQ ts_sec: "<<ts_sec[nADC-1]<<std::endl;
 
     return 0;
 }
