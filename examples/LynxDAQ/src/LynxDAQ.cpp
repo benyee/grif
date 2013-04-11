@@ -23,13 +23,15 @@ LynxDAQ::~LynxDAQ() {
 GRIDAQBaseAccumNode* LynxDAQ::RegisterDataOutput(QString outName) {
     //Initialize accumulators.
     //Need to make sure the variable types match the variable types that you post with PostData
+  //int td = 250;
+  int td = 1000;
   GRIDAQBaseAccumNode* p = NULL;
   if (outName == "ADCOutput") {
-    p = new GRIDAQAccumulator<double>(outName,1e6,5,250);
+    p = new GRIDAQAccumulator<double>(outName,1e6,5,td);
   } else if (outName == "TS") {
-    p = new GRIDAQAccumulator<double>(outName,1e6,5,250);
+    p = new GRIDAQAccumulator<double>(outName,1e6,5,td);
   } else if (outName == "LiveTime"){
-    p = new GRIDAQAccumulator<double>(outName,1e6,5,250);
+    p = new GRIDAQAccumulator<double>(outName,1e6,5,td);
   }
   return p;
 }

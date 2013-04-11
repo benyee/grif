@@ -110,8 +110,8 @@ int SIMAnalysisThread::Analyze() {
             lineCount = 0;
         }
 
-        std::cout<<"Analysis ts_sec: "<<std::endl;
-        std::cout<<ts_sec[nADC-1]<<std::endl;
+        //std::cout<<"Analysis ts_sec: "<<std::endl;
+        //std::cout<<ts_sec[nADC-1]<<std::endl;
 
     }
 
