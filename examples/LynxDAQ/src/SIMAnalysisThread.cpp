@@ -95,12 +95,12 @@ int SIMAnalysisThread::Analyze() {
         //Write new raw data to file and then store it:
         for(int i = 0; i < nADC; i++){
             //outfile<< ADC[i]<<'\t'<<std::setprecision(25)<<ts_sec[i]<<'\t'<<std::setprecision(25)<<liveTime<<'\n';
-            outfile<< ADC[i]<<'\t'<<std::setprecision(20)<<ts_sec[i]<<'\n';
+            outfile<< ADC[i]<<'\t'<<floor(pow(10.0,6)*ts_sec[i])/pow(10.0,6)<<'\n';
             lineCount++;
             //storedEvents.first.push_back(ADC[i]);
             //storedEvents.second.push_back(ts_sec[i]);
         }
-        outfile<< -9999 <<'\t'<<std::setprecision(25)<<liveTime<<'\n';
+        outfile<< -9999 <<'\t'<<(int)liveTime<<'\n';
 
         if(lineCount >= maxLineCount){
             closeFile();
@@ -127,7 +127,7 @@ void SIMAnalysisThread::setFileName(std::string s,bool restart, std::string ext)
     }
 
     if (restart) {fileNumber = 0;}
-    filename = rawfilename +"_" + QString::number(fileNumber).toStdString()+ ext;
+    filename = "C:/Users/BeARING/Dropbox/UCB Air Monitor/Data/Roof/current/" +rawfilename +"_" + QString::number(fileNumber).toStdString()+ ext;
 }
 
 void SIMAnalysisThread::setHistRate(double rate, int histNum){
